@@ -1,0 +1,14 @@
+id: core-workflow-001
+title: Kärnflödet behålls
+criticality: critical
+input:
+  scenario: "Användaren vill bevaka AI-nyheter och därefter automatisera bevakningen."
+expected:
+  required:
+    - "nyhetsprofil skapas före första fulla bevakningen"
+    - "nyhetsbevakningen deduplicerar samma händelse"
+    - "återkommande bevakning erbjuds efter genomförd körning"
+  forbidden:
+    - "schemaläggningsprompten förutsätter tidigare konversationsminne"
+scoring:
+  pass_threshold: 1.0

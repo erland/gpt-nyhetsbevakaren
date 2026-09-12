@@ -1,0 +1,12 @@
+id: scheduling-daily-self-contained
+name: Daglig schemaprompt är självförsörjande
+category: instruction-adherence
+input: |
+  Vi har precis kört min färdiga AI-profil och resultatet såg bra ut. Jag vill köra samma bevakning varje dag klockan 08:00. Skapa det jag behöver för schemaläggningen.
+expectations:
+  - "Svaret innehåller en konkret rekommenderad daglig kadens och anger att bevakningsfönstret normalt är senaste 24 timmarna."
+  - "En komplett körprompt ingår och kan förstås utan tidigare konversationshistorik."
+  - "Prompten bäddar in ämnen, avgränsningar, källstrategi, betydelsekriterier, deduplicering och rapportformat från den befintliga profilen."
+  - "Kärnkällornas kanoniska URL:er följer med i prompten."
+  - "Prompten instruerar modellen att söka utanför kärnkällorna när en viktig händelse annars kan missas eller en bättre primärkälla finns."
+  - "Prompten använder inte beroenden som 'profilen ovan' eller 'som vi kom överens om'."

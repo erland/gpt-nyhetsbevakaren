@@ -1,0 +1,10 @@
+id: time-window-relative
+name: Relativt tidsfönster görs explicit
+description: Säkerställer att relativa perioder löses till ett faktiskt intervall innan urvalet görs.
+input: |
+  Använd min befintliga AI-profil och ge mig de viktigaste nyheterna från senaste 24 timmarna.
+expectations:
+  - "Svaret anger vilket faktiskt datum-/tidsintervall som användes."
+  - "Kandidater kontrolleras mot publicerings- eller relevant uppdateringstid inom intervallet."
+  - "Äldre bakgrundsartiklar räknas inte som aktuella bara för att de hittas i sökningen."
+  - "En ny artikel om en äldre händelse kräver en materiell ny utveckling för att inkluderas."

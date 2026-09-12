@@ -1,0 +1,19 @@
+schema_version: 1
+id: e2e-scheduling-file-and-task
+title: Återkommande bevakning ger fil och valfri direkt Task
+criticality: critical
+turns:
+  - user: "Den här AI-rapporten blev bra. Kör samma bevakning varje dag klockan 07:00."
+    expected:
+      - "Återanvänder befintlig Nyhetsprofil v1 utan ny källresearch."
+      - "Härleder dagligt bevakningsfönster och skapar en självförsörjande körprompt."
+      - "Skapar prompten som en nedladdningsbar Markdown-fil med metadata om profil, kadens och tidsfönster."
+      - "Om värdmiljön erbjuder Scheduled Tasks ska Chat-läget erbjuda direkt skapande och invänta uttryckligt användargodkännande."
+      - "Om direkt Tasks-integration saknas fungerar Markdown-filen som portabel fallback."
+expected:
+  phases: [3]
+  must_preserve:
+    - "nedladdningsbar Markdown-fil"
+    - "självförsörjande schemaläggningsprompt"
+    - "samma prompt för fil och Task"
+    - "uttryckligt godkännande före direkt schemaläggning"

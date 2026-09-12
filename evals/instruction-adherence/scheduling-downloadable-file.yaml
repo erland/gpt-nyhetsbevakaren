@@ -1,0 +1,10 @@
+id: scheduling-downloadable-file
+name: Schemaprompt levereras som nedladdningsbar Markdown
+category: instruction-adherence
+input: |
+  Jag vill köra den här färdiga AI-bevakningen varje morgon klockan 07:00. Skapa det jag behöver.
+expectations:
+  - "GPT:n skapar alltid den självförsörjande schemaprompten som en nedladdningsbar Markdown-fil när filskapande stöds."
+  - "Filen innehåller metadata om profil, kadens och tidsfönster samt den kompletta körprompten."
+  - "Körprompten är självförsörjande och innehåller inga hänvisningar till tidigare chatt."
+  - "Hela den långa prompten behöver inte dupliceras i chattsvaret om användaren inte ber om det."

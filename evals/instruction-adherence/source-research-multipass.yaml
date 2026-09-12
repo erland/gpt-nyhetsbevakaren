@@ -1,0 +1,16 @@
+id: source-research-multipass-001
+title: Källresearch görs i flera pass
+criticality: critical
+input:
+  scenario: "Användaren vill skapa en bevakningsprofil för AI-agenter och ber GPT:n hitta de bästa källorna."
+expected:
+  required:
+    - "kandidatkällor söks brett i flera relevanta källkategorier"
+    - "kandidater verifieras mot faktisk aktuell ämnestäckning"
+    - "originalkällor skiljs från medier som huvudsakligen återger dem"
+    - "källor värderas efter relevans, originalitet, aktualitet, trovärdighet och kompletterande värde"
+    - "resultatet är en prioriterad källstrategi, inte en osorterad URL-lista"
+  forbidden:
+    - "första träfflistan accepteras direkt som slutlig källprofil"
+scoring:
+  pass_threshold: 1.0

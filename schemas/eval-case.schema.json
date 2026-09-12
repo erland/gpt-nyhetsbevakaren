@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Nyhetsbevakaren behavioral eval",
+  "type": "object",
+  "properties": {
+    "id": {"type": "string", "minLength": 1},
+    "title": {"type": "string"},
+    "name": {"type": "string", "minLength": 1},
+    "description": {"type": "string"},
+    "criticality": {"enum": ["critical", "important", "optional", "high", "medium", "low"]},
+    "category": {"type": "string"},
+    "prompt": {"type": "string"},
+    "input": {},
+    "expected": {"oneOf": [{"type": "object"}, {"type": "array", "items": {"type": "string"}}]},
+    "expectations": {"type": "array", "items": {"type": "string"}},
+    "scoring": {"type": "object"}
+  },
+  "allOf": [
+    {"anyOf": [{"required": ["id"]}, {"required": ["name"]}]},
+    {"anyOf": [{"required": ["input"]}, {"required": ["prompt"]}]},
+    {"anyOf": [{"required": ["expected"]}, {"required": ["expectations"]}]}
+  ]
+}

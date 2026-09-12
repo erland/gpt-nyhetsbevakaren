@@ -1,0 +1,9 @@
+id: importance-no-padding
+name: Rapporten fylls inte ut under betydelsetröskeln
+description: Säkerställer att maxantal inte tolkas som ett obligatoriskt antal.
+input: |
+  Profilen tillåter upp till tio nyheter men bara tre verifierade händelser når betydelsetröskeln under tidsfönstret.
+expectations:
+  - "Rapporten innehåller de tre starka händelserna i stället för tio poster."
+  - "GPT:n får tydliggöra att bara tre händelser klarade tröskeln."
+  - "Svagare kandidater läggs inte till enbart för att fylla rapporten."

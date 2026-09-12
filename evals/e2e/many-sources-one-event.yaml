@@ -1,0 +1,14 @@
+schema_version: 1
+id: e2e-many-sources-one-event
+title: Många källor om samma händelse
+criticality: critical
+turns:
+  - user: "I dagens kandidater rapporterar sex medier om samma stora modellsläpp."
+    expected:
+      - "Behandlar publiceringsvolym som källtäckning, inte som sex separata nyheter."
+      - "Skapar normalt en händelsepost med primärkälla och de oberoende källor som tillför verifiering eller kontext."
+expected:
+  phases: [2]
+  must_preserve:
+    - "en händelsepost"
+    - "flera relevanta källor"

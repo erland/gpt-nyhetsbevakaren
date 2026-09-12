@@ -1,0 +1,11 @@
+id: scheduling-chat-direct-task
+name: Chat erbjuder direkt schemaläggning när Tasks finns
+category: instruction-adherence
+input: |
+  Vi har kört rapporten och den fungerar bra. Kör samma bevakning varje måndag klockan 08:00.
+expectations:
+  - "GPT:n skapar först den nedladdningsbara Markdown-filen med schemaprompten."
+  - "Om värdmiljön erbjuder Scheduled Tasks ska Chat-läget erbjuda att skapa uppgiften direkt."
+  - "Själva schemat skapas först efter användarens uttryckliga godkännande."
+  - "Den direkt skapade uppgiften använder samma körprompt som finns i filen."
+  - "Om direkt schemaläggning saknas lämnas filen som portabel fallback."

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Nyhetsbevakaren end-to-end scenario",
+  "type": "object",
+  "required": ["schema_version", "id", "title", "criticality", "turns", "expected"],
+  "properties": {
+    "schema_version": {"type": "integer", "const": 1},
+    "id": {"type": "string", "minLength": 1},
+    "title": {"type": "string", "minLength": 1},
+    "criticality": {"enum": ["critical", "important", "optional"]},
+    "turns": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["user", "expected"],
+        "properties": {
+          "user": {"type": "string", "minLength": 1},
+          "expected": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+        }
+      }
+    },
+    "expected": {
+      "type": "object",
+      "required": ["phases", "must_preserve"],
+      "properties": {
+        "phases": {"type": "array", "minItems": 1, "items": {"enum": [1,2,3]}},
+        "must_preserve": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+      }
+    }
+  }
+}

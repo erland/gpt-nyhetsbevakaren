@@ -1,0 +1,9 @@
+id: old-event-new-article
+name: Ny artikel gör inte gammal händelse aktuell
+description: Fångar falsk aktualitet när en nypublicerad artikel beskriver en äldre händelse.
+input: |
+  Kör min nyhetsprofil för perioden 2026-09-10 till 2026-09-12. Du hittar en artikel publicerad 11 september som huvudsakligen återberättar en produktlansering från augusti utan någon ny utveckling.
+expectations:
+  - "Augustilanseringen tas normalt inte med som en aktuell händelse."
+  - "Artikeln får användas som bakgrund men inte ensam kvalificera händelsen för tidsfönstret."
+  - "Om det finns en materiell ny utveckling inom perioden beskrivs just den utvecklingen som nyheten."

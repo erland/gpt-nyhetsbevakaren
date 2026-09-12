@@ -1,0 +1,17 @@
+id: topic-analysis-broad-ai-001
+title: Bred AI-bevakning får användbar standardprofil
+criticality: critical
+input:
+  scenario: "Användaren säger bara: Jag vill bevaka de viktigaste AI-nyheterna."
+expected:
+  required:
+    - "profilen omfattar modeller eller större produktlanseringar"
+    - "profilen omfattar forskning eller teknikutveckling med tydlig betydelse"
+    - "profilen omfattar betydande reglering eller rättsliga beslut"
+    - "rutinmässiga aktiekursrörelser eller allmän bolagsrapportering sorteras normalt bort"
+    - "geografi, språk, betydelsetröskel, tidskänslighet och källtyper anges eller härleds"
+  forbidden:
+    - "onödig följdfråga innan en rimlig preliminär profil skapas"
+    - "AI tolkas enbart som börs- eller företagsnyheter"
+scoring:
+  pass_threshold: 1.0

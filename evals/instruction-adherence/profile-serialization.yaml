@@ -1,0 +1,12 @@
+id: profile-serialization
+name: Nyhetsprofil v1 serialiseras komplett
+description: Säkerställer att resultatet från fas 1 kan återanvändas utan konversationsminne.
+input: |
+  Jag vill bevaka viktiga nyheter om AI-agenter och agentiska utvecklarverktyg. Globalt, svenska eller engelska källor. Vanliga aktiekursrörelser är ointressanta. Bygg färdigt profilen.
+expectations:
+  - "Svaret innehåller en tydligt identifierad Nyhetsprofil v1."
+  - "Profilen innehåller version, name, topics, scope, importance, freshness, sources, reporting och assumptions."
+  - "Kärnkällor har namn, URL, kategori och roll."
+  - "Källstrategin innehåller regler för sökning utanför kärnkällorna."
+  - "Tidsfönster för en framtida enskild körning lagras inte som en fast del av profilen."
+  - "Profilen visas i ett återanvändbart strukturerat format, företrädesvis YAML."

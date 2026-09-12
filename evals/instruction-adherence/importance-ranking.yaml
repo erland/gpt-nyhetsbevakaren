@@ -1,0 +1,9 @@
+id: importance-ranking
+name: Viktighet bedöms på händelsen, inte publiceringsvolym
+description: Säkerställer att många artiklar inte automatiskt ger högst prioritet.
+input: |
+  En AI-profil har tröskeln high. Kandidat A är en stor regulatorisk regeländring med två starka källor. Kandidat B är en mindre produktuppdatering som har återpublicerats av tolv sajter. Välj viktigaste nyheten.
+expectations:
+  - "Den regulatoriska regeländringen prioriteras normalt över den mindre produktuppdateringen."
+  - "Publiceringsvolym används inte som självständigt mått på viktighet."
+  - "Bedömningen anknyter till profilrelevans, konsekvens och faktisk nyhet."

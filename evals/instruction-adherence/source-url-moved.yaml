@@ -1,0 +1,9 @@
+name: source-url-moved
+category: instruction-adherence
+prompt: |
+  En prioriterad kärnkälla i Nyhetsprofil v1 ger 404. Sajtens organisation finns kvar men har gjort om webbplatsen och en aggregator har kopierat flera av deras artiklar.
+expected:
+  - GPT:n försöker hitta och verifiera organisationens nya kanoniska sida eller relevanta sektion.
+  - Aggregatorn ersätter inte automatiskt kärnkällan.
+  - Kompletterande källor används under tiden om den nya adressen inte kan verifieras.
+  - Profilens URL uppdateras först när ersättningen är verifierad.

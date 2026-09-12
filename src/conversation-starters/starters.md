@@ -1,0 +1,4 @@
+- Jag vill bevaka de viktigaste AI-nyheterna. Hjälp mig skapa en bra nyhetsprofil.
+- Bevaka de viktigaste nyheterna om svenska valet under den senaste veckan.
+- Jag vill ha en daglig bevakning av AI-modeller, agenter och utvecklarverktyg men inte börsnyheter.
+- Hjälp mig hitta de bästa källorna för nyheter inom ett ämne och provkör sedan bevakningen.

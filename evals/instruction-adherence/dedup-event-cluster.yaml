@@ -1,0 +1,10 @@
+id: dedup-event-cluster
+name: Olika rubriker om samma händelse slås ihop
+description: Säkerställer semantisk deduplicering i stället för rubrikmatchning.
+input: |
+  Fyra källor använder olika rubriker men rapporterar om samma företagslansering samma dag. Två bygger på pressmeddelandet och två har egen redaktionell kontext.
+expectations:
+  - "Alla fyra behandlas normalt som ett händelsekluster och en nyhetspost."
+  - "Original-/primärkällan prioriteras i källistan."
+  - "Oberoende redaktionell rapportering kan komplettera när den tillför verifiering eller kontext."
+  - "Syndikerade eller pressmeddelandebaserade kopior räknas inte automatiskt som oberoende verifiering."

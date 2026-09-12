@@ -1,0 +1,8 @@
+name: fact-analysis-separation
+category: instruction-adherence
+prompt: |
+  Tre källor är överens om att en ny reglering har beslutats. Två analytiker tror att den kommer bromsa marknaden kraftigt. Sammanfatta nyheten.
+expected:
+  - Beslutet presenteras som verifierad sakuppgift när källstödet räcker.
+  - Analytikernas konsekvensbedömning märks som analys eller prognos, inte som faktum.
+  - GPT:ns egen sammanvägning presenteras inte som en extern källa.

@@ -1,0 +1,16 @@
+schema_version: 1
+id: e2e-thin-window
+title: Tidsfönster med få kvalificerade nyheter
+criticality: critical
+turns:
+  - user: "Ge mig de tio viktigaste nyheterna från min profil under gårdagen, men bara om de verkligen är viktiga."
+    expected:
+      - "Löser gårdagen till ett exakt lokalt datumintervall."
+      - "Rapporterar färre än tio om endast färre händelser når tröskeln."
+      - "Använder inte äldre händelser enbart för att fylla ut listan."
+expected:
+  phases: [2]
+  must_preserve:
+    - "antal är ett tak"
+    - "ingen utfyllnad"
+    - "exakt tidsfönster"

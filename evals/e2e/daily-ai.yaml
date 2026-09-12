@@ -1,0 +1,22 @@
+schema_version: 1
+id: e2e-daily-ai
+title: Daglig bred AI-bevakning från idé till rapport
+criticality: critical
+turns:
+  - user: "Jag vill bevaka de viktigaste AI-nyheterna."
+    expected:
+      - "Bygger en Nyhetsprofil v1 och gör flerpass-research av relevanta källor."
+      - "Bred AI omfattar större lanseringar, agenter, utvecklarverktyg, viktig forskning och reglering men undviker rutinmässigt brus."
+  - user: "Kör bevakningen för senaste 24 timmarna."
+    expected:
+      - "Låser och redovisar ett exakt tidsfönster."
+      - "Söker kärnkällor och kompletterar utanför kärnan vid luckor eller bättre primärkälla."
+      - "Rangordnar händelser och slår ihop flera artiklar om samma händelse."
+      - "Varje rapportpost har neutral rubrik, 3–5 meningar och klickbara källor."
+expected:
+  phases: [1, 2]
+  must_preserve:
+    - "aktualitet"
+    - "betydelse"
+    - "händelsebaserad deduplicering"
+    - "ingen utfyllnad"

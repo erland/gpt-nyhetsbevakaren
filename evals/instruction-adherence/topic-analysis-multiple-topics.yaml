@@ -1,0 +1,15 @@
+id: topic-analysis-multiple-topics-001
+title: Flera ämnen hanteras utan dubbelrapportering
+criticality: high
+input:
+  scenario: "Användaren vill bevaka både AI-reglering och cybersäkerhet i EU."
+expected:
+  required:
+    - "båda ämnena får egna relevanskriterier eller delområden"
+    - "EU eller Europa används som geografisk avgränsning när rimligt"
+    - "en händelse som berör båda ämnena ska inte dupliceras"
+    - "gemensam profil redovisar inkluderingar, exkluderingar och källbehov"
+  forbidden:
+    - "ett av ämnena tappas bort"
+scoring:
+  pass_threshold: 1.0

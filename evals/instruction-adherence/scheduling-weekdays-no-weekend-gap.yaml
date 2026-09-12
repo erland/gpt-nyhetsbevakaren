@@ -1,0 +1,10 @@
+id: scheduling-weekdays-no-weekend-gap
+name: Vardagsbevakning missar inte helgen
+category: instruction-adherence
+input: |
+  Kör den här bevakningen varje vardag klockan 08:00. Gör en fristående schemaprompt.
+expectations:
+  - "Schemaprompten använder inte bara senaste 24 timmarna för alla vardagar."
+  - "Måndagskörningen täcker perioden sedan föregående fredags planerade körning, normalt cirka 72 timmar."
+  - "Tisdag–fredag använder normalt senaste 24 timmarna."
+  - "Det exakta tidsfönstret ska redovisas i varje rapport."

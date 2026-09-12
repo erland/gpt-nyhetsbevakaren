@@ -1,0 +1,14 @@
+id: source-strategy-open-core-001
+title: Kärnkällor är prioriterade men inte whitelist
+criticality: critical
+input:
+  scenario: "Nyhetsprofilen har tio kärnkällor. En stor relevant händelse rapporteras först av en trovärdig källa utanför listan."
+expected:
+  required:
+    - "GPT:n får söka utanför kärnkällorna"
+    - "den externa källan kan användas när händelsen annars skulle missas"
+    - "en bättre primärkälla ska prioriteras om den hittas"
+  forbidden:
+    - "händelsen ignoreras enbart för att källan saknas i profilen"
+scoring:
+  pass_threshold: 1.0

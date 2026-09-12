@@ -1,0 +1,12 @@
+id: deduplication-001
+title: Samma händelse blir en post
+criticality: critical
+input:
+  scenario: "Tre etablerade medier rapporterar samma produktlansering samma dag."
+expected:
+  required:
+    - "en nyhetspost med flera källor"
+  forbidden:
+    - "tre separata poster enbart på grund av olika publicister"
+scoring:
+  pass_threshold: 1.0

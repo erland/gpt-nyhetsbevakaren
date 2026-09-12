@@ -1,0 +1,19 @@
+schema_version: 1
+id: e2e-swedish-election
+title: Veckovis bevakning av svenska valet
+criticality: critical
+turns:
+  - user: "Skapa en bevakning av de viktigaste nyheterna kring svenska riksdagsvalet."
+    expected:
+      - "Källstrategin kombinerar behöriga/officiella källor, relevanta primärkällor och etablerad redaktionell rapportering."
+      - "Saklig bredd används utan falsk ekvivalens eller mekanisk politisk kvotering."
+  - user: "Kör för senaste sju dagarna."
+    expected:
+      - "Skiljer officiella resultat och beslut från kampanjpåståenden, prognoser och opinionsmätningar."
+      - "Osäkerhet och motstridiga uppgifter redovisas tydligt."
+expected:
+  phases: [1, 2]
+  must_preserve:
+    - "politisk neutralitet"
+    - "officiella resultat"
+    - "opinionsmätningar är inte resultat"

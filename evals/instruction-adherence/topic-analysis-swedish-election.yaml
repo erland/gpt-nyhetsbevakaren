@@ -1,0 +1,17 @@
+id: topic-analysis-swedish-election-001
+title: Svensk valbevakning blir saklig och händelseorienterad
+criticality: critical
+input:
+  scenario: "Användaren vill varje vecka få de viktigaste nyheterna om det svenska riksdagsvalet."
+expected:
+  required:
+    - "profilen fokuserar på verifierbara händelser med faktisk betydelse för valet"
+    - "opinionsmätningar skiljs från beslut och faktiska resultat"
+    - "valadministration, större politiska besked och betydande kampanjutveckling kan ingå"
+    - "publiceringsvolym från ett parti eller en aktör används inte som betydelsemått"
+    - "svensk geografi och relevanta svenska källtyper härleds"
+  forbidden:
+    - "partipolitisk argumentation"
+    - "falsk balans mellan verifierade fakta och obelagda påståenden"
+scoring:
+  pass_threshold: 1.0
