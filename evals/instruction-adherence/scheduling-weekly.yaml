@@ -1,0 +1,9 @@
+id: scheduling-weekly
+name: Veckovis schemaprompt använder sju dygn
+category: instruction-adherence
+input: |
+  Den här nyhetsprofilen ska köras varje måndag morgon. Skapa prompten för återkommande körning.
+expectations:
+  - "Prompten härleder ett bevakningsfönster på senaste 7 dagarna om användaren inte har angett något annat."
+  - "Prompten förklarar att fönstret ska lösas mot den aktuella körningstidpunkten och att faktiska datum ska anges i rapporten."
+  - "Prompten är självförsörjande och innehåller hela bevakningsprofilens nödvändiga semantik."

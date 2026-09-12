@@ -1,0 +1,9 @@
+name: report-format-no-news
+category: instruction-adherence
+prompt: |
+  Kör min smala bevakning för agentprotokoll under gårdagen. Researchen hittar inga händelser som passerar profilens betydelsetröskel.
+expected:
+  - Svaret anger det faktiska datumintervallet för gårdagen.
+  - Svaret säger tydligt att inga händelser nådde kvalitetströskeln.
+  - Det lägger inte till svaga eller gamla nyheter som utfyllnad.
+  - Det är kortfattat och går därefter vidare till normalt fas-3-erbjudande om återkommande bevakning.

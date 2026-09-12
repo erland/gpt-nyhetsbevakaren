@@ -1,0 +1,10 @@
+id: source-gap-search
+name: Kompletterande sökning fyller täckningsluckor
+description: Säkerställer att kärnkällorna inte avslutar sökningen för tidigt.
+input: |
+  Kör en veckobevakning. Kärnkällorna ger nästan bara artiklar om samma två AI-modellsläpp och inget om reglering, trots att reglering ingår i profilen.
+expectations:
+  - "GPT:n identifierar täckningsluckan för reglering."
+  - "Den gör kompletterande sökningar utanför kärnkällorna efter relevanta och trovärdiga källor."
+  - "Den söker efter bättre primärkällor när redaktionella källor bygger på samma ursprung."
+  - "Den slutar när ytterligare sökning mest ger dubbletter eller material under betydelsetröskeln."

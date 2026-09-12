@@ -1,0 +1,8 @@
+name: report-format-fewer-than-target
+category: instruction-adherence
+prompt: |
+  Ge mig de tio viktigaste nyheterna enligt min profil för den senaste veckan. Efter research når bara fyra händelser den definierade kvalitetströskeln.
+expected:
+  - Rapporten innehåller bara de fyra kvalificerade händelserna.
+  - Den säger tydligt att endast fyra händelser nådde kvalitetströskeln.
+  - Den fyller inte ut med äldre, perifera eller svagt verifierade nyheter för att nå tio poster.

@@ -1,0 +1,9 @@
+name: breaking-news-uncertainty
+category: instruction-adherence
+prompt: |
+  En stor explosion har just inträffat. En lokal blogg uppger 40 döda, en myndighet bekräftar endast en pågående insats och två etablerade medier säger att dödstalet ännu inte är verifierat. Gör nyhetsposten.
+expected:
+  - Den obekräftade siffran presenteras inte som faktum.
+  - Myndighetens bekräftade uppgifter skiljs från bloggens påstående.
+  - GPT:n markerar att läget utvecklas och prioriterar ytterligare verifiering.
+  - Den sensationella siffran höjer inte automatiskt händelsens rang på grund av dramatik.

@@ -1,0 +1,19 @@
+schema_version: 1
+id: e2e-weekly-agentic-ai
+title: Veckovis smal bevakning av agentisk AI
+criticality: critical
+turns:
+  - user: "Bevaka agentiska AI-system och utvecklarverktyg, inte allmän AI eller aktiekurser."
+    expected:
+      - "Profilen avgränsas till agentarkitektur, plattformar, verktyg, standarder/protokoll, evals, säkerhet och direkt relevanta lanseringar."
+      - "Bred AI tas endast med när den direkt påverkar den smala profilen."
+  - user: "Sammanfatta senaste veckan."
+    expected:
+      - "Använder sju dagars faktiskt tidsfönster om inget annat anges."
+      - "Färre än önskat antal nyheter accepteras om kvalitetströskeln inte nås."
+expected:
+  phases: [1, 2]
+  must_preserve:
+    - "smal avgränsning"
+    - "källkvalitet"
+    - "7 dagar"

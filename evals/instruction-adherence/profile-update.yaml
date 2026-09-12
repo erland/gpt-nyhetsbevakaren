@@ -1,0 +1,10 @@
+id: profile-update
+name: Profiländring bevarar stabilitet och triggar relevant omprövning
+description: Kontrollerar att en befintlig profil ändras selektivt och att källresearch görs om när ändringen kräver det.
+input: |
+  Utgå från min befintliga AI-profil men ändra geografin från global till Norden och lägg till offentlig sektor som viktigt delområde. Behåll övriga preferenser.
+expectations:
+  - "Oförändrade profilvärden bevaras i stället för att uppfinnas på nytt."
+  - "Geografi och delämne uppdateras uttryckligen."
+  - "Källstrategin omprövas eftersom geografi och täckningsbehov har ändrats."
+  - "Formatversionen förblir version 1."

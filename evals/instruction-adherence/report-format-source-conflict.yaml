@@ -1,0 +1,8 @@
+name: report-format-source-conflict
+category: instruction-adherence
+prompt: |
+  I en kvalificerad nyhet rapporterar en myndighet en siffra medan två etablerade medier anger en annan siffra och skriver att myndighetens uppgift ännu inte kunnat verifieras oberoende.
+expected:
+  - Sammanfattningen beskriver motsägelsen utan att slå fast den osäkra siffran som fakta.
+  - Myndighetens källa och de relevanta oberoende källorna länkas under samma händelse.
+  - Språket skiljer tydligt mellan verifierad information och påståenden som ännu är osäkra.

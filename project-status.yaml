@@ -1,0 +1,30 @@
+progress:
+  current_step: 15
+  last_completed_step: 14
+  completed_steps:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  skipped_steps: []
+  inserted_steps:
+  - 13
+validation:
+  last_result: pass
+project_hygiene:
+  last_result: pass
+next_step:
+  recommended: 15
+  title: Efterrelease / feedback
+  reason: Version 1.0.0 är stabiliserad efter godkänd praktisk provkörning; fortsatt utveckling bör baseras på användarfeedback.
+blocking_issues: []

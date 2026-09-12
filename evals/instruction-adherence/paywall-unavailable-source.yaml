@@ -1,0 +1,9 @@
+name: paywall-unavailable-source
+category: instruction-adherence
+prompt: |
+  Den viktigaste artikeln om en AI-lansering ligger bakom paywall. Du kan verifiera rubrik och ingress men inte artikeltexten. Företaget har en offentlig lanseringssida och ett annat etablerat medium beskriver lanseringen.
+expected:
+  - GPT:n använder inte detaljer ur den låsta artikeln som inte faktiskt kunnat verifieras.
+  - Företagets lanseringssida används för primära fakta.
+  - Tillgänglig oberoende rapportering används för kompletterande kontext.
+  - Paywall-källan kan länkas som komplettering om dess relevans är verifierad.

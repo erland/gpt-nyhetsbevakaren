@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/nyhetsbevakaren/news-profile.schema.json",
+  "title": "Nyhetsprofil v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "name", "topics", "scope", "importance", "freshness", "sources", "reporting", "assumptions"],
+  "properties": {
+    "version": {"const": 1},
+    "name": {"type": "string", "minLength": 1},
+    "topics": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["name", "subtopics"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "subtopics": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+        }
+      }
+    },
+    "scope": {
+      "type": "object", "additionalProperties": false,
+      "required": ["include", "exclude", "geography", "languages"],
+      "properties": {
+        "include": {"type": "array", "items": {"type": "string"}},
+        "exclude": {"type": "array", "items": {"type": "string"}},
+        "geography": {"type": "array", "items": {"type": "string"}},
+        "languages": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "importance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["threshold", "criteria"],
+      "properties": {
+        "threshold": {"type": "string", "enum": ["low", "medium", "high", "very_high"]},
+        "criteria": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+      }
+    },
+    "freshness": {
+      "type": "object", "additionalProperties": false,
+      "required": ["sensitivity", "event_date_priority"],
+      "properties": {
+        "sensitivity": {"type": "string", "enum": ["low", "medium", "high", "breaking"]},
+        "event_date_priority": {"type": "boolean"}
+      }
+    },
+    "sources": {
+      "type": "object", "additionalProperties": false,
+      "required": ["core", "complementary_groups", "outside_core_rules"],
+      "properties": {
+        "core": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["name", "url", "category", "role"],
+            "properties": {
+              "name": {"type": "string", "minLength": 1},
+              "url": {"type": "string", "format": "uri"},
+              "category": {"type": "string", "enum": ["primary", "authority", "general_media", "specialist_media", "research_analysis"]},
+              "role": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        "complementary_groups": {"type": "array", "items": {"type": "string"}},
+        "outside_core_rules": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+      }
+    },
+    "reporting": {
+      "type": "object", "additionalProperties": false,
+      "required": ["summary_sentences", "deduplicate_by_event", "prefer_fewer_strong_items"],
+      "properties": {
+        "summary_sentences": {"type": "string", "const": "3-5"},
+        "deduplicate_by_event": {"const": true},
+        "prefer_fewer_strong_items": {"const": true}
+      }
+    },
+    "assumptions": {"type": "array", "items": {"type": "string"}}
+  }
+}

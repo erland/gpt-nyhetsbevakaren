@@ -1,0 +1,4 @@
+Release readiness: READY_WITH_WARNINGS
+- project_zip: ready_with_warnings
+- chat_zip: ready_with_warnings
+- custom_gpt: ready_with_warnings

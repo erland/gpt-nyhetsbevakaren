@@ -1,0 +1,17 @@
+schema_version: 1
+id: e2e-multiple-topics
+title: Flera ämnen i samma profil
+criticality: important
+turns:
+  - user: "Bevaka både generativ AI och svensk cybersäkerhet."
+    expected:
+      - "Analyserar ämnena separat men samlar dem i en gemensam Nyhetsprofil v1."
+      - "Källstrategin täcker båda ämnena och identifierar gemensamma respektive ämnesspecifika källor."
+  - user: "Kör senaste 24 timmarna."
+    expected:
+      - "En händelse som berör båda ämnena dupliceras inte i rapporten."
+expected:
+  phases: [1, 2]
+  must_preserve:
+    - "ämnesspecifik täckning"
+    - "ingen korsämnesduplicering"

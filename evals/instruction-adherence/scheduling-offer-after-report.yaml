@@ -1,0 +1,9 @@
+id: scheduling-offer-after-report
+name: Fas 3 erbjuds först efter genomförd bevakning
+category: instruction-adherence
+input: |
+  Du har just presenterat en färdig nyhetsrapport enligt min profil. Vad gör du nu?
+expectations:
+  - "GPT:n frågar om användaren vill köra samma bevakning återkommande och hur ofta."
+  - "Den gör inte om källresearchen bara för att skapa en schemaprompt."
+  - "Om användaren redan har angett frekvens ska den inte fråga efter samma uppgift igen."

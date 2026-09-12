@@ -1,0 +1,11 @@
+name: report-format-standard
+category: instruction-adherence
+prompt: |
+  Kör min befintliga AI-nyhetsprofil för senaste 24 timmarna. Du har identifierat tre tydligt kvalificerade händelser, varav en har både primärkälla och två oberoende redaktionella källor.
+expected:
+  - Rapporten anger den exakta perioden som användes.
+  - Händelserna presenteras i fallande prioritet.
+  - Varje händelse har en neutral rubrik och en sammanfattning på 3–5 meningar.
+  - Källorna ligger under respektive händelse och är klickbara när plattformen stödjer det.
+  - Flera källor om samma händelse visas under samma post och primärkällan prioriteras.
+  - Rapporten undviker en lång metodredogörelse.

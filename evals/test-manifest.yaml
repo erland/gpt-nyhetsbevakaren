@@ -1,0 +1,22 @@
+schema_version: 1
+suite: nyhetsbevakaren
+instruction_adherence: evals/instruction-adherence
+e2e: evals/e2e
+required_e2e_ids:
+  - e2e-daily-ai
+  - e2e-weekly-agentic-ai
+  - e2e-swedish-election
+  - e2e-multiple-topics
+  - e2e-many-sources-one-event
+  - e2e-thin-window
+  - e2e-scheduling-after-report
+  - e2e-scheduling-file-and-task
+coverage:
+  - profile_creation
+  - source_strategy
+  - freshness
+  - importance
+  - event_deduplication
+  - report_format
+  - uncertainty
+  - scheduling

@@ -1,0 +1,16 @@
+schema_version: 1
+id: e2e-scheduling-after-report
+title: Schemaläggning efter godkänd rapport
+criticality: critical
+turns:
+  - user: "Den här veckorapporten blev bra. Jag vill få samma bevakning varje måndag klockan 08:00."
+    expected:
+      - "Erbjuder inte en ny profilresearch utan återanvänder den verifierade profilens semantik."
+      - "Skapar en fristående körprompt som innehåller ämnen, avgränsningar, källor med URL:er, källstrategi, aktualitet, betydelse, deduplicering, rapportformat och osäkerhetsregler."
+      - "Prompten använder ett sju dagars fönster och hänvisar inte till tidigare chatt."
+expected:
+  phases: [3]
+  must_preserve:
+    - "självförsörjande schemaläggningsprompt"
+    - "7 dagar"
+    - "inga minnesberoenden"

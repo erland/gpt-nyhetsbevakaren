@@ -1,0 +1,15 @@
+id: topic-analysis-ai-agents-001
+title: Smal agentbevakning hålls fokuserad
+criticality: high
+input:
+  scenario: "Användaren vill bevaka AI-agenter och agentiska utvecklarverktyg, men inte allmän AI-branschbevakning."
+expected:
+  required:
+    - "agentarkitektur, agentplattformar eller verktygsanvändning ingår"
+    - "relevanta standarder, protokoll, evals eller säkerhet kan ingå"
+    - "bred AI-nyhet tas bara med när den direkt påverkar agentområdet"
+    - "profilen innehåller tydliga inkluderingar och exkluderingar"
+  forbidden:
+    - "profilen breddas automatiskt till generell AI-bevakning"
+scoring:
+  pass_threshold: 1.0

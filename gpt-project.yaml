@@ -1,0 +1,83 @@
+schema_version: 1
+project:
+  id: nyhetsbevakaren
+  name: Nyhetsbevakaren
+  language: sv
+analysis:
+  profile: workflow_research_heavy
+  features:
+    research_heavy: true
+    evidence_required: true
+    multi_stage_workflow: true
+instructions:
+  canonical: src/instructions/system.md
+  core_contract:
+    enabled: true
+    required_markers:
+    - bygg och kvalitetssäkra nyhetsprofil → kör nyhetsbevakning → erbjud återkommande
+      bevakning
+    - Händelsebaserad deduplicering
+    - självförsörjande schemaläggningsprompt
+    - nedladdningsbar Markdown-fil
+    required_runtime_dependencies: []
+    max_required_file_hops: 1
+    knowledge_may_not_be_required_for_core_behavior: true
+structure:
+  runtime_policy:
+    path: src/runtime-policy
+  conversation_starters:
+    path: src/conversation-starters
+  schemas:
+    path: schemas
+  scripts:
+    path: scripts
+  templates:
+    path: templates
+knowledge_architecture:
+  canonical_root: knowledge
+  custom_gpt:
+    priority:
+    - source-strategy-rubric.md
+    - freshness-time-window.md
+    - news-profile-format.md
+    - importance-deduplication.md
+    - report-format.md
+    - scheduling-prompt.md
+    - robustness-source-criticism.md
+runtime:
+  primary: none
+  chat_zip:
+    enabled: true
+    entrypoint: START-HERE.md
+    start_here_template: templates/START-HERE.chat.md.tpl
+  custom_gpt:
+    enabled: true
+    instruction:
+      mode: compiled
+      max_characters: 8000
+    knowledge:
+      max_files: 20
+      strategy: prioritize
+    templates:
+      capabilities: templates/capabilities.md.tpl
+      readme: templates/README.custom-gpt.md.tpl
+      compatibility: templates/COMPATIBILITY.md.tpl
+development:
+  plan: docs/development-plan.md
+  status: project-status.yaml
+ci:
+  enabled: true
+  default: true
+  workflow: .github/workflows/ci.yml
+release:
+  github:
+    enabled: true
+    default: true
+    optional: false
+    version_source: github_release_tag
+    workflow: .github/workflows/release.yml
+testing:
+  manifest: evals/test-manifest.yaml
+  eval_case_schema: schemas/eval-case.schema.json
+  e2e_schema: schemas/e2e-news-scenario.schema.json
+  validation_script: scripts/validate_evals.py

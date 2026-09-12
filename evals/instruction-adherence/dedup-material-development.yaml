@@ -1,0 +1,9 @@
+id: dedup-material-development
+name: Materiell ny utveckling får egen post
+description: Säkerställer att deduplicering inte gömmer en senare händelse med eget nyhetsvärde.
+input: |
+  På måndag presenterar regeringen ett förslag. På torsdag fattas ett slutligt beslut med en viktig ändring jämfört med förslaget. Båda ligger inom veckans bevakningsfönster och passerar profilens betydelsetröskel.
+expectations:
+  - "Beslutet behandlas som en materiell ny utveckling med eget nyhetsvärde."
+  - "Förslag och slutligt beslut kan därför bli separata händelseposter."
+  - "Svaret förklarar sambandet utan att slå ihop allt enbart för att ämnet är detsamma."
