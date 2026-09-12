@@ -10,7 +10,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install pyyaml
+      - run: pip install pyyaml jsonschema
       - run: python scripts/lint_gpt_project.py --project-root .
       - run: python scripts/project_hygiene.py --project-root . --mode checkpoint
       - run: python scripts/build_distributions.py --project-root . --version 0.0.0-ci --targets project,chat,custom-gpt
