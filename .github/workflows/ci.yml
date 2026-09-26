@@ -22,8 +22,11 @@ jobs:
         run: python scripts/validate_news_robustness.py
 
       - run: python scripts/build_distributions.py --project-root . --version 0.0.0-ci
-      - run: python scripts/validate_distributions.py --project-root .
+      - run: python scripts/validate_distributions.py --project-root . --version 0.0.0-ci
       - run: python scripts/validate_runtime_parity.py --project-root .
+
+      - name: Validate release asset set
+        run: python scripts/validate_release_assets.py --version 0.0.0-ci
 
       - name: Validate eval suite
         run: python scripts/validate_evals.py --project-root .
