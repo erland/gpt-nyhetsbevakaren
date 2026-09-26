@@ -44,14 +44,147 @@ knowledge_architecture:
     - report-format.md
     - scheduling-prompt.md
     - robustness-source-criticism.md
+
+capabilities:
+  contract_version: 1
+  schema: schemas/capability-contract.schema.json
+  recommendation_mode: inferred_from_use_case
+  ask_user_only_when_business_choice_is_ambiguous: true
+  requirements:
+    web_research:
+      level: required
+      reason: "Aktuell nyhetsbevakning kräver färsk webbsökning, källöppning och verifiering."
+    source_navigation:
+      level: required
+      reason: "Källor måste kunna öppnas, verifieras och länkas spårbart."
+    file_generation:
+      level: required_for_phase_3
+      reason: "Schemaläggningsprompten ska kunna levereras som nedladdningsbar Markdown när värdmiljön stöder filskapande."
+    scheduling_action:
+      level: optional
+      reason: "Direkt Scheduled Task är en runtime-förbättring och får aldrig vara ett krav för kärnbeteendet."
+    structured_data:
+      level: recommended
+      reason: "Nyhetsprofilen serialiseras strukturerat och används som stabil konfiguration."
+    code_execution:
+      level: not_required
+      reason: "Kärnflödet kräver inte exekvering av lokala scripts i runtime."
+    persistent_state:
+      level: not_required
+      reason: "Nyhetsprofil och fristående schemaläggningsprompt bär återanvändbar konfiguration mellan körningar."
+    external_tools:
+      level: optional
+      reason: "Kärnflödet ska fungera utan MCP eller leverantörsspecifika externa integrationer."
+
+artifacts:
+  contract_version: 1
+  schema: schemas/artifact-contract.schema.json
+  outputs:
+    news_profile:
+      kind: configuration
+      format: markdown_yaml
+      requirement: required_phase_1
+      persistence: portable
+      multiplicity: one
+      description: "Nyhetsprofil v1 med ämnen, avgränsning, källstrategi, betydelsekriterier och antaganden."
+    news_report:
+      kind: report
+      format: markdown
+      requirement: required_phase_2
+      persistence: ephemeral
+      multiplicity: one
+      description: "Aktuell nyhetsrapport med kvalificerade händelser, sammanfattningar och klickbara källor."
+    scheduling_prompt:
+      kind: prompt
+      format: markdown
+      requirement: required_phase_3
+      persistence: portable
+      multiplicity: one
+      description: "Självförsörjande prompt för återkommande bevakning utan beroende av tidigare chattminne."
+    uncertainty_note:
+      kind: metadata
+      format: markdown
+      requirement: conditional
+      condition: "conflicting_or_insufficient_evidence"
+      persistence: ephemeral
+      multiplicity: one
+      description: "Tydlig markering av osäker information, konflikt mellan källor eller underlagsbrist."
+
+state:
+  contract_version: 1
+  schema: schemas/state-contract.schema.json
+  persistent_workspace_required: false
+  conversation_state:
+    allowed: true
+    authoritative: false
+  portable_state:
+    news_profile:
+      required_for_reuse: true
+      source: artifact
+    scheduling_prompt:
+      self_contained: true
+      source: artifact
+  source_of_truth:
+    instruction: src/instructions/system.md
+    knowledge: knowledge
+    evals: evals/test-manifest.yaml
+
+tools:
+  contract_version: 1
+  schema: schemas/tool-contract.schema.json
+  tools:
+    - id: web-research
+      type: runtime_capability
+      requirement: required
+      purpose: "Söka, öppna och verifiera aktuella nyhetskällor."
+      deterministic: false
+      mutates_workspace: false
+      runtime_fallback: block_current_news
+    - id: distribution-build
+      type: script
+      requirement: required_development
+      purpose: "Bygga runtime-distributioner."
+      script: scripts/build_distributions.py
+      deterministic: true
+      mutates_workspace: true
+      runtime_fallback: not_applicable
+    - id: distribution-validation
+      type: script
+      requirement: required_development
+      purpose: "Validera runtime-distributioner."
+      script: scripts/validate_distributions.py
+      deterministic: true
+      mutates_workspace: false
+      runtime_fallback: not_applicable
+    - id: eval-suite
+      type: script
+      requirement: required_development
+      purpose: "Validera eval-manifest och scenarier."
+      script: scripts/validate_evals.py
+      deterministic: true
+      mutates_workspace: false
+      runtime_fallback: not_applicable
 runtime:
   primary: none
   chat_zip:
     enabled: true
+    status: active
+    adapter_id: chat_zip
+    build_target: chat
+    artifact_name: nyhetsbevakaren-chat-{version}.zip
     entrypoint: START-HERE.md
     start_here_template: templates/START-HERE.chat.md.tpl
+    source:
+      instructions: src/instructions/system.md
+      knowledge: knowledge
+      conversation_starters: src/conversation-starters
+      runtime_policy: src/runtime-policy
   custom_gpt:
     enabled: true
+    status: active
+    adapter_id: custom_gpt
+    build_target: custom-gpt
+    artifact_name: nyhetsbevakaren-custom-gpt-{version}.zip
     instruction:
       mode: compiled
       max_characters: 8000
@@ -62,6 +195,92 @@ runtime:
       capabilities: templates/capabilities.md.tpl
       readme: templates/README.custom-gpt.md.tpl
       compatibility: templates/COMPATIBILITY.md.tpl
+    source:
+      instructions: src/instructions/system.md
+      knowledge: knowledge
+      conversation_starters: src/conversation-starters
+  claude_projects:
+    status: active
+    adapter_id: claude_projects
+    build_target: claude-projects
+    artifact_name: nyhetsbevakaren-claude-projects-{version}.zip
+    entrypoint: START-HERE.md
+    start_here_template: templates/START-HERE.chat.md.tpl
+    source:
+      instructions: src/instructions/system.md
+      knowledge: knowledge
+      conversation_starters: src/conversation-starters
+      runtime_policy: src/runtime-policy
+    compatibility:
+      web_research: required
+      source_navigation: required
+      file_generation: required_for_phase_3
+      scheduling_action: optional
+      persistent_state: not_required
+  opencode:
+    status: active
+    adapter_id: opencode
+    build_target: opencode
+    artifact_name: nyhetsbevakaren-opencode-{version}.zip
+    entrypoint: START-HERE.md
+    start_here_template: templates/START-HERE.chat.md.tpl
+    source:
+      instructions: src/instructions/system.md
+      knowledge: knowledge
+      conversation_starters: src/conversation-starters
+      runtime_policy: src/runtime-policy
+    compatibility:
+      web_research: required
+      source_navigation: required
+      file_generation: required_for_phase_3
+      scheduling_action: optional
+      persistent_state: not_required
+      filesystem_read: supported
+      code_execution: not_required
+  openai_plugin:
+    status: active
+    adapter_id: openai_plugin
+    build_target: openai-plugin
+    artifact_name: nyhetsbevakaren-openai-plugin-{version}.zip
+    manifest:
+      name: nyhetsbevakaren
+      display_name: Nyhetsbevakaren
+      description: "Bygg och kör aktuell ämnesbaserad nyhetsbevakning med källkritik, händelsebaserad deduplicering och portabel schemaläggningsprompt."
+      category: Productivity
+    skill:
+      id: nyhetsbevakaren
+      source_instruction: src/instructions/system.md
+      knowledge: knowledge
+      runtime_policy: src/runtime-policy
+      conversation_starters: src/conversation-starters
+      eval_manifest: evals/test-manifest.yaml
+    compatibility:
+      architecture: skills_first
+      web_research: required
+      source_navigation: required
+      file_generation: required_for_phase_3
+      scheduling_action: optional
+      external_integrations: none
+      persistent_state: not_required
+      bundled_script_execution: not_assumed
+
+build_system:
+  current:
+    script: scripts/build_distributions.py
+    validation_script: scripts/validate_distributions.py
+    runtime_selection: status_active
+    project_artifact:
+      enabled: true
+      artifact_name: nyhetsbevakaren-project.zip
+    compatibility_mode: preserve_existing_artifact_names_and_layout
+  migration_target:
+    runtimes:
+      - chat_zip
+      - custom_gpt
+      - claude_projects
+      - opencode
+      - openai_plugin
+
 development:
   plan: docs/development-plan.md
   status: project-status.yaml
@@ -76,8 +295,26 @@ release:
     optional: false
     version_source: github_release_tag
     workflow: .github/workflows/release.yml
+    asset_selection: active_runtimes
+    include_metadata:
+      - SHA256SUMS.txt
+      - DELIVERY-MANIFEST.json
 testing:
   manifest: evals/test-manifest.yaml
   eval_case_schema: schemas/eval-case.schema.json
   e2e_schema: schemas/e2e-news-scenario.schema.json
   validation_script: scripts/validate_evals.py
+
+migration:
+  target_builder_version: 1.5.0
+  strategy: behavior_preserving
+  plan: docs/migration-gpt-builder-1.5.0.md
+  status: migration-status.yaml
+  preserve:
+    canonical_instruction: src/instructions/system.md
+    product_plan: docs/development-plan.md
+    product_status: project-status.yaml
+    evals: true
+    knowledge: true
+  current_distribution_count: 2
+  target_distribution_count: 5

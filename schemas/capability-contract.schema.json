@@ -1,0 +1,14 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"Capability Contract",
+  "type":"object",
+  "required":["contract_version","recommendation_mode","requirements"],
+  "properties":{
+    "contract_version":{"type":"integer","const":1},
+    "schema":{"type":"string"},
+    "recommendation_mode":{"enum":["inferred_from_use_case","explicit"]},
+    "ask_user_only_when_business_choice_is_ambiguous":{"type":"boolean"},
+    "requirements":{"type":"object","minProperties":1,"additionalProperties":true}
+  },
+  "additionalProperties":false
+}

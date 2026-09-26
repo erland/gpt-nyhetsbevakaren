@@ -1,21 +1,49 @@
 # STATUS
 
-## Aktuell status
+## Produktstatus
 
-Nyhetsbevakaren **1.0.0** är stabilt releasad efter att `1.0.0-rc.2` praktiskt provkörts utan rapporterade blockerande fel. Funktionaliteten är fryst för 1.0.0.
+Nyhetsbevakaren **1.0.0** är stabilt releasad efter att `1.0.0-rc.2` praktiskt provkörts utan rapporterade blockerande fel. Funktionaliteten i 1.0.0 är fortsatt referens för den beteendebevarande migreringen.
 
-Fas 3 levererar alltid schemaläggningsprompten som en nedladdningsbar Markdown-fil när filskapande stöds. I Chat-läge kan Nyhetsbevakaren dessutom erbjuda att skapa en Scheduled Task direkt när värdmiljön har sådan capability; uppgiften skapas först efter uttryckligt användargodkännande och använder samma prompt som filen.
+## GPT Byggaren 1.5.0-migrering
 
-## Stabil release
+Migreringen är nu i slutlig release-readiness.
 
-- Version: `1.0.0`
+- fem aktiva runtimes: Chat ZIP, Custom GPT, Claude Projects, OpenCode och OpenAI Plugin,
+- canonical instruktion: `src/instructions/system.md`,
+- webbresearch/source navigation: required för aktuell nyhetsbevakning,
+- persistent workspace-state: inte required,
+- direkt schemaläggning: optional capability,
+- nyhetsprofil och schemaläggningsprompt: portabla artefakter,
+- OpenAI Plugin: Agent Plugins 1.0, skills-first, utan antagen MCP/Tasks,
+- deklarativ build och release från `gpt-project.yaml`,
+- exakt release-assetuppsättning valideras före publicering.
+
+## Kvalitetsgrindar
+
+CI verifierar:
+
+- projektlint,
+- GPT Builder 1.5 platform contracts,
+- project hygiene,
+- news robustness/hygiene,
+- build av fem runtimes,
+- distributionsvalidering,
+- runtime parity,
+- release asset set,
+- eval suite.
+
+Kritiska kvalitetsområden omfattar freshness, source quality, event deduplication, uncertainty, political neutrality och scheduling portability.
+
+## Stabil releasehistorik
+
+- Produktversion: `1.0.0`
 - Föregående RC: `1.0.0-rc.2`
 - Praktisk provkörning: godkänd 2026-09-12
 - Instruction-adherence-evals: 33
 - E2E-scenarier: 8
-- Lint/hygiene/evals/distribution/runtime parity: ska PASS:a i final build
-- Blockers före final build: 0
 
-## Nästa rekommenderade steg
+## Nästa åtgärd
 
-Ingen ytterligare funktion krävs för 1.0.0. Nästa utvecklingsarbete bör ske som en ny version efter insamlad användarfeedback.
+När slutlig release-readiness och PR-CI är grön kan migrations-PR:n mergas. Därefter kan nästa stabila release skapas med semantisk release-tagg; taggen styr versionsnumret i runtime-distributionerna.
+
+Maskinläsbar migrationsstatus finns i `migration-status.yaml`.

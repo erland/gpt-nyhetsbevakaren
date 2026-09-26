@@ -27,6 +27,27 @@ def load_config(root: Path) -> dict:
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
+def active_runtime_targets(cfg: dict) -> set[str]:
+    targets=set()
+    for runtime_id, rcfg in (cfg.get("runtime") or {}).items():
+        if not isinstance(rcfg, dict) or rcfg.get("status") != "active":
+            continue
+        target=rcfg.get("build_target")
+        if target:
+            targets.add(target)
+    return targets
+
+
+def runtime_artifact_name(cfg: dict, runtime_id: str, version: str) -> str:
+    rcfg=(cfg.get("runtime") or {}).get(runtime_id)
+    if not isinstance(rcfg, dict):
+        raise SystemExit(f"Missing runtime config: {runtime_id}")
+    pattern=rcfg.get("artifact_name")
+    if not pattern:
+        raise SystemExit(f"Runtime {runtime_id} is missing artifact_name")
+    return pattern.format(version=version)
+
+
 def sha256(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as f:
@@ -156,6 +177,191 @@ def build_chat(root: Path, cfg: dict, build_root: Path, version: str) -> Path:
     if parity_doc.exists():
         copy_file(parity_doc, out / "RUNTIME-PARITY.md")
     write_manifest(out, cfg["project"]["id"] + "-chat", version, "START-HERE.md")
+    return out
+
+
+def build_claude(root: Path, cfg: dict, build_root: Path, version: str) -> Path:
+    out = build_root / "claude-projects"
+    ensure_clean_dir(out)
+
+    assistant = out / "assistant"
+    policies = assistant / "policies"
+    policies.mkdir(parents=True)
+
+    rcfg = cfg["runtime"]["claude_projects"]
+    copy_file(root / rcfg["source"]["instructions"], assistant / "instructions.md")
+
+    starters_root = root / rcfg["source"]["conversation_starters"]
+    if starters_root.exists():
+        starters = [p for p in starters_root.rglob("*") if p.is_file() and p.name != "README.md"]
+        if starters:
+            combined = "\n\n".join(p.read_text(encoding="utf-8") for p in sorted(starters))
+            (assistant / "conversation-starters.md").write_text(combined, encoding="utf-8")
+
+    policy_root = root / rcfg["source"]["runtime_policy"]
+    if policy_root.exists():
+        for p in sorted(policy_root.rglob("*.md")):
+            copy_file(p, policies / p.name)
+
+    knowledge_root = root / rcfg["source"]["knowledge"]
+    if knowledge_root.exists():
+        for p in sorted(knowledge_root.rglob("*")):
+            if p.is_file() and p.name != "KNOWLEDGE.md":
+                copy_file(p, out / "knowledge" / p.relative_to(knowledge_root))
+
+    template = (root / rcfg["start_here_template"]).read_text(encoding="utf-8")
+    (out / "START-HERE.md").write_text(
+        render_template(template, {"GPT_NAME": cfg["project"]["name"], "VERSION": version}),
+        encoding="utf-8",
+    )
+    (out / "VERSION").write_text(version + "\n", encoding="utf-8")
+
+    parity_doc = root / "docs" / "runtime-parity.md"
+    if parity_doc.exists():
+        copy_file(parity_doc, out / "RUNTIME-PARITY.md")
+
+    (out / "RUNTIME-REQUIREMENTS.md").write_text(
+        "# Claude Projects runtimekrav\n\n"
+        "- Aktuell webbresearch och källöppning krävs för nyhetsbevakning.\n"
+        "- Filskapande behövs i fas 3 för portabel schemaläggningsprompt när miljön stöder det.\n"
+        "- Direkt schemaläggning är optional och får inte antas finnas.\n"
+        "- Persistent workspace-state krävs inte.\n",
+        encoding="utf-8",
+    )
+    write_manifest(out, cfg["project"]["id"] + "-claude-projects", version, "START-HERE.md")
+    return out
+
+
+def build_opencode(root: Path, cfg: dict, build_root: Path, version: str) -> Path:
+    out = build_root / "opencode"
+    ensure_clean_dir(out)
+
+    assistant = out / "assistant"
+    policies = assistant / "policies"
+    policies.mkdir(parents=True)
+
+    rcfg = cfg["runtime"]["opencode"]
+    copy_file(root / rcfg["source"]["instructions"], assistant / "instructions.md")
+
+    starters_root = root / rcfg["source"]["conversation_starters"]
+    if starters_root.exists():
+        starters = [p for p in starters_root.rglob("*") if p.is_file() and p.name != "README.md"]
+        if starters:
+            combined = "\n\n".join(p.read_text(encoding="utf-8") for p in sorted(starters))
+            (assistant / "conversation-starters.md").write_text(combined, encoding="utf-8")
+
+    policy_root = root / rcfg["source"]["runtime_policy"]
+    if policy_root.exists():
+        for p in sorted(policy_root.rglob("*.md")):
+            copy_file(p, policies / p.name)
+
+    knowledge_root = root / rcfg["source"]["knowledge"]
+    if knowledge_root.exists():
+        for p in sorted(knowledge_root.rglob("*")):
+            if p.is_file() and p.name != "KNOWLEDGE.md":
+                copy_file(p, out / "knowledge" / p.relative_to(knowledge_root))
+
+    template = (root / rcfg["start_here_template"]).read_text(encoding="utf-8")
+    (out / "START-HERE.md").write_text(
+        render_template(template, {"GPT_NAME": cfg["project"]["name"], "VERSION": version}),
+        encoding="utf-8",
+    )
+    (out / "VERSION").write_text(version + "\n", encoding="utf-8")
+    parity_doc = root / "docs" / "runtime-parity.md"
+    if parity_doc.exists():
+        copy_file(parity_doc, out / "RUNTIME-PARITY.md")
+
+    (out / "RUNTIME-REQUIREMENTS.md").write_text(
+        "# OpenCode runtimekrav\n\n"
+        "- Aktuell webbresearch och källöppning krävs för nyhetsbevakning.\n"
+        "- Lokal kodexekvering är inte en förutsättning för kärnflödet.\n"
+        "- Filskapande behövs i fas 3 när värdmiljön stöder det.\n"
+        "- Direkt schemaläggning är optional.\n"
+        "- Persistent workspace-state krävs inte.\n",
+        encoding="utf-8",
+    )
+    write_manifest(out, cfg["project"]["id"] + "-opencode", version, "START-HERE.md")
+    return out
+
+
+def build_openai_plugin(root: Path, cfg: dict, build_root: Path, version: str) -> Path:
+    out = build_root / "openai-plugin"
+    ensure_clean_dir(out)
+
+    rcfg = cfg["runtime"]["openai_plugin"]
+    plugin_root = out / rcfg["manifest"]["name"]
+    skill_root = plugin_root / "skills" / rcfg["skill"]["id"]
+    refs = skill_root / "references"
+    (refs / "knowledge").mkdir(parents=True, exist_ok=True)
+
+    manifest = {
+        "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+        "name": rcfg["manifest"]["name"],
+        "version": version,
+        "description": rcfg["manifest"]["description"],
+        "author": {"name": "Erland Lindmark"},
+        "extensions": {
+            "com.openai": {
+                "interface": {
+                    "displayName": rcfg["manifest"]["display_name"],
+                    "shortDescription": "Aktuell källkritisk nyhetsbevakning",
+                    "longDescription": rcfg["manifest"]["description"],
+                    "developerName": "Erland Lindmark",
+                    "category": rcfg["manifest"]["category"],
+                    "capabilities": ["Interactive"],
+                    "defaultPrompt": [
+                        "Bygg en nyhetsprofil för mitt ämne.",
+                        "Kör aktuell nyhetsbevakning för den senaste veckan.",
+                        "Skapa en självförsörjande prompt för återkommande bevakning."
+                    ]
+                }
+            }
+        }
+    }
+    (plugin_root / "plugin.json").write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    canonical = (root / rcfg["skill"]["source_instruction"]).read_text(encoding="utf-8").strip()
+    skill_text = (
+        "---\n"
+        f"name: {rcfg['skill']['id']}\n"
+        "description: Bygg nyhetsprofiler, genomför aktuell källkritisk nyhetsbevakning, deduplicera händelser "
+        "och skapa självförsörjande schemaläggningsprompter. Använd när användaren vill bevaka ett ämne eller "
+        "återkommande följa nyheter.\n"
+        "---\n\n"
+        "# Nyhetsbevakaren\n\n"
+        "Aktuell nyhetsbevakning kräver webbresearch och källöppning i värdmiljön. "
+        "Om sådan capability saknas får aktuell information inte ersättas med minnesbaserade påståenden.\n\n"
+        "## Runtime-regler\n\n"
+        "- Persistent workspace-state krävs inte.\n"
+        "- Tidigare chatt får inte vara enda sanningskälla för återkommande bevakning.\n"
+        "- I fas 3 ska en självförsörjande Markdown-prompt skapas när filskapande stöds.\n"
+        "- Direkt schemaläggning är optional och får endast användas när värdmiljön faktiskt stöder det.\n"
+        "- Ingen MCP- eller extern integration antas finnas.\n"
+        "- Lokal scriptkörning är inte en förutsättning för kärnflödet.\n\n"
+        "## Kanoniskt beteendekontrakt\n\n"
+        + canonical + "\n"
+    )
+    (skill_root / "SKILL.md").write_text(skill_text, encoding="utf-8")
+
+    knowledge_root = root / rcfg["skill"]["knowledge"]
+    for p in sorted(knowledge_root.rglob("*")):
+        if p.is_file() and p.name != "KNOWLEDGE.md":
+            copy_file(p, refs / "knowledge" / p.relative_to(knowledge_root))
+
+    policy_root = root / rcfg["skill"]["runtime_policy"]
+    if policy_root.exists():
+        copy_tree_filtered(policy_root, refs / "runtime-policy")
+
+    starters_root = root / rcfg["skill"]["conversation_starters"]
+    if starters_root.exists():
+        copy_tree_filtered(starters_root, refs / "conversation-starters")
+
+    eval_manifest = root / rcfg["skill"]["eval_manifest"]
+    copy_file(eval_manifest, refs / "test-manifest.yaml")
+
     return out
 
 
@@ -387,7 +593,8 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--project-root", default=".")
     parser.add_argument("--version", default="0.0.0-dev")
-    parser.add_argument("--targets", default="project,chat,custom-gpt")
+    parser.add_argument("--targets", default=None,
+                        help="Comma-separated build targets. Default: project plus all active runtimes from gpt-project.yaml")
     args = parser.parse_args()
 
     root = Path(args.project_root).resolve()
@@ -397,22 +604,41 @@ def main() -> int:
     build_root.mkdir(exist_ok=True)
     dist.mkdir(exist_ok=True)
 
-    targets = {t.strip() for t in args.targets.split(",") if t.strip()}
+    if args.targets:
+        targets = {t.strip() for t in args.targets.split(",") if t.strip()}
+    else:
+        targets = {"project"} | active_runtime_targets(cfg)
     project_id = cfg["project"]["id"]
     version = args.version
 
     if "chat" in targets:
         chat_root = build_chat(root, cfg, build_root, version)
-        chat_zip = dist / f"{project_id}-chat-{version}.zip"
+        chat_zip = dist / runtime_artifact_name(cfg, "chat_zip", version)
         stable_write_zip(chat_zip, chat_root, [p for p in chat_root.rglob("*") if p.is_file()])
+
+    if "claude-projects" in targets:
+        claude_root = build_claude(root, cfg, build_root, version)
+        claude_zip = dist / runtime_artifact_name(cfg, "claude_projects", version)
+        stable_write_zip(claude_zip, claude_root, [p for p in claude_root.rglob("*") if p.is_file()])
+
+    if "opencode" in targets:
+        opencode_root = build_opencode(root, cfg, build_root, version)
+        opencode_zip = dist / runtime_artifact_name(cfg, "opencode", version)
+        stable_write_zip(opencode_zip, opencode_root, [p for p in opencode_root.rglob("*") if p.is_file()])
+
+    if "openai-plugin" in targets:
+        plugin_root = build_openai_plugin(root, cfg, build_root, version)
+        plugin_zip = dist / runtime_artifact_name(cfg, "openai_plugin", version)
+        stable_write_zip(plugin_zip, plugin_root, [p for p in plugin_root.rglob("*") if p.is_file()])
 
     if "custom-gpt" in targets and cfg["runtime"]["custom_gpt"]["enabled"]:
         custom_root = build_custom(root, cfg, build_root, version)
-        custom_zip = dist / f"{project_id}-custom-gpt-{version}.zip"
+        custom_zip = dist / runtime_artifact_name(cfg, "custom_gpt", version)
         stable_write_zip(custom_zip, custom_root, [p for p in custom_root.rglob("*") if p.is_file()])
 
     if "project" in targets:
-        project_zip = dist / f"{project_id}-project.zip"
+        project_pattern = cfg["build_system"]["current"]["project_artifact"]["artifact_name"]
+        project_zip = dist / project_pattern.format(version=version)
         stable_write_zip(project_zip, root, project_files(root))
 
     write_checksums(dist)

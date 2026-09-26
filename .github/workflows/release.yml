@@ -12,17 +12,57 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install pyyaml
+
+      - run: pip install pyyaml jsonschema
+
       - id: version
         shell: bash
         run: |
           TAG="${{ github.event.release.tag_name }}"
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([+-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid release tag: $TAG" >&2
+            exit 1
+          fi
           echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
-      - run: python scripts/build_distributions.py --project-root . --version "${{ steps.version.outputs.version }}" --targets project,chat,custom-gpt
-      - run: python scripts/validate_distributions.py --project-root .
-      - env:
+
+      - run: python scripts/lint_gpt_project.py --project-root .
+
+      - name: Validate GPT Builder 1.5 platform contracts
+        run: python scripts/validate_platform_contracts.py
+
+      - run: python scripts/project_hygiene.py --project-root . --mode checkpoint
+
+      - name: Validate news robustness and hygiene
+        run: python scripts/validate_news_robustness.py
+
+      - name: Build active runtimes
+        run: python scripts/build_distributions.py --project-root . --version "${{ steps.version.outputs.version }}"
+
+      - name: Validate distributions
+        run: python scripts/validate_distributions.py --project-root . --version "${{ steps.version.outputs.version }}"
+
+      - name: Validate runtime parity
+        run: python scripts/validate_runtime_parity.py --project-root .
+
+      - name: Validate eval suite
+        run: python scripts/validate_evals.py --project-root .
+
+      - name: Validate release asset set
+        run: python scripts/validate_release_assets.py --version "${{ steps.version.outputs.version }}"
+
+      - name: Attach declared runtime assets to GitHub Release
+        env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${{ github.event.release.tag_name }}" dist/*.zip dist/SHA256SUMS.txt dist/DELIVERY-MANIFEST.json --clobber
+        shell: bash
+        run: |
+          mapfile -t assets < <(python scripts/validate_release_assets.py \
+            --version "${{ steps.version.outputs.version }}" \
+            --print-paths)
+          gh release upload "${{ github.event.release.tag_name }}" \
+            "${assets[@]}" \
+            --clobber \
+            --repo "${{ github.repository }}"

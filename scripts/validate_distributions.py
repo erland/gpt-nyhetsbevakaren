@@ -88,18 +88,158 @@ def validate_chat(root: Path, cfg: dict) -> list[str]:
     return errors
 
 
+def validate_claude(root: Path, cfg: dict) -> list[str]:
+    errors=[]
+    build=root/"build"/"claude-projects"
+    if not build.exists():
+        return ["Claude Projects build directory missing"]
+
+    required=[
+        build/"START-HERE.md",
+        build/"VERSION",
+        build/"MANIFEST.json",
+        build/"RUNTIME-REQUIREMENTS.md",
+        build/"assistant"/"instructions.md",
+    ]
+    for p in required:
+        if not p.exists():
+            errors.append(f"Missing required Claude file: {p.relative_to(build)}")
+
+    rcfg=cfg["runtime"]["claude_projects"]
+    canonical=(root/rcfg["source"]["instructions"]).read_bytes()
+    instr=build/"assistant"/"instructions.md"
+    if instr.exists() and instr.read_bytes()!=canonical:
+        errors.append("Claude instruction is not byte-identical to canonical instruction")
+
+    source_k=root/rcfg["source"]["knowledge"]
+    build_k=build/"knowledge"
+    expected={p.relative_to(source_k).as_posix() for p in source_k.rglob("*") if p.is_file() and p.name!="KNOWLEDGE.md"}
+    actual={p.relative_to(build_k).as_posix() for p in build_k.rglob("*") if p.is_file()} if build_k.exists() else set()
+    if actual!=expected:
+        errors.append(f"Claude Knowledge differs from canonical: expected={sorted(expected)}, actual={sorted(actual)}")
+    return errors
+
+
+def validate_opencode(root: Path, cfg: dict) -> list[str]:
+    errors=[]
+    build=root/"build"/"opencode"
+    if not build.exists():
+        return ["OpenCode build directory missing"]
+
+    required=[
+        build/"START-HERE.md",
+        build/"VERSION",
+        build/"MANIFEST.json",
+        build/"RUNTIME-REQUIREMENTS.md",
+        build/"assistant"/"instructions.md",
+    ]
+    for p in required:
+        if not p.exists():
+            errors.append(f"Missing required OpenCode file: {p.relative_to(build)}")
+
+    rcfg=cfg["runtime"]["opencode"]
+    canonical=(root/rcfg["source"]["instructions"]).read_bytes()
+    instr=build/"assistant"/"instructions.md"
+    if instr.exists() and instr.read_bytes()!=canonical:
+        errors.append("OpenCode instruction is not byte-identical to canonical instruction")
+
+    source_k=root/rcfg["source"]["knowledge"]
+    build_k=build/"knowledge"
+    expected={p.relative_to(source_k).as_posix() for p in source_k.rglob("*") if p.is_file() and p.name!="KNOWLEDGE.md"}
+    actual={p.relative_to(build_k).as_posix() for p in build_k.rglob("*") if p.is_file()} if build_k.exists() else set()
+    if actual!=expected:
+        errors.append(f"OpenCode Knowledge differs from canonical: expected={sorted(expected)}, actual={sorted(actual)}")
+    return errors
+
+
+def validate_openai_plugin(root: Path, cfg: dict, version: str) -> list[str]:
+    errors=[]
+    build=root/"build"/"openai-plugin"
+    rcfg=cfg["runtime"]["openai_plugin"]
+    plugin_root=build/rcfg["manifest"]["name"]
+    if not plugin_root.exists():
+        return ["OpenAI Plugin build directory missing"]
+
+    manifest_path=plugin_root/"plugin.json"
+    if not manifest_path.exists():
+        errors.append("OpenAI Plugin missing plugin.json")
+        return errors
+
+    manifest=json.loads(manifest_path.read_text(encoding="utf-8"))
+    if manifest.get("$schema")!="https://agent-plugins.org/schemas/1.0.0/plugin.schema.json":
+        errors.append("OpenAI Plugin uses wrong Agent Plugins schema")
+    if manifest.get("name")!=rcfg["manifest"]["name"]:
+        errors.append("OpenAI Plugin name mismatch")
+    if manifest.get("version")!=version:
+        errors.append(f"OpenAI Plugin version mismatch: {manifest.get('version')} != {version}")
+
+    skill=plugin_root/"skills"/rcfg["skill"]["id"]/"SKILL.md"
+    if not skill.exists():
+        errors.append("OpenAI Plugin missing SKILL.md")
+    else:
+        text=skill.read_text(encoding="utf-8")
+        canonical=(root/rcfg["skill"]["source_instruction"]).read_text(encoding="utf-8").strip()
+        if canonical not in text:
+            errors.append("OpenAI Plugin skill does not contain canonical instruction")
+        for marker in cfg["instructions"]["core_contract"]["required_markers"]:
+            if marker not in text:
+                errors.append(f"OpenAI Plugin skill missing core marker: {marker}")
+        if "Ingen MCP- eller extern integration antas finnas." not in text:
+            errors.append("OpenAI Plugin skill must not imply integrations")
+
+    source_k=root/rcfg["skill"]["knowledge"]
+    plugin_k=plugin_root/"skills"/rcfg["skill"]["id"]/"references"/"knowledge"
+    expected={p.relative_to(source_k).as_posix() for p in source_k.rglob("*") if p.is_file() and p.name!="KNOWLEDGE.md"}
+    actual={p.relative_to(plugin_k).as_posix() for p in plugin_k.rglob("*") if p.is_file()} if plugin_k.exists() else set()
+    if actual!=expected:
+        errors.append(f"OpenAI Plugin Knowledge differs from canonical: expected={sorted(expected)}, actual={sorted(actual)}")
+
+    if (plugin_root/"mcp.json").exists():
+        errors.append("OpenAI Plugin must not invent mcp.json")
+    return errors
+
+
+def validate_declared_artifacts(root: Path, cfg: dict, version: str) -> list[str]:
+    errors=[]
+    dist=root/"dist"
+    expected=set()
+    project_artifact=cfg.get("build_system",{}).get("current",{}).get("project_artifact",{})
+    if project_artifact.get("enabled"):
+        expected.add(project_artifact["artifact_name"].format(version=version))
+    for runtime_id,rcfg in (cfg.get("runtime") or {}).items():
+        if not isinstance(rcfg,dict) or rcfg.get("status")!="active":
+            continue
+        pattern=rcfg.get("artifact_name")
+        if not pattern:
+            errors.append(f"Active runtime missing artifact_name: {runtime_id}")
+            continue
+        expected.add(pattern.format(version=version))
+    actual={p.name for p in dist.glob("*.zip")} if dist.exists() else set()
+    if actual!=expected:
+        errors.append(f"Declared artifact mismatch: actual={sorted(actual)} expected={sorted(expected)}")
+    return errors
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--project-root", default=".")
+    parser.add_argument("--version", default="0.0.0-ci")
     args = parser.parse_args()
 
     root = Path(args.project_root).resolve()
     cfg = load_cfg(root)
 
     errors = []
+    errors.extend(validate_declared_artifacts(root, cfg, args.version))
     errors.extend(validate_chat(root, cfg))
     if cfg["runtime"]["custom_gpt"]["enabled"]:
         errors.extend(validate_custom(root, cfg))
+    if cfg["runtime"].get("claude_projects", {}).get("status") == "active":
+        errors.extend(validate_claude(root, cfg))
+    if cfg["runtime"].get("opencode", {}).get("status") == "active":
+        errors.extend(validate_opencode(root, cfg))
+    if cfg["runtime"].get("openai_plugin", {}).get("status") == "active":
+        errors.extend(validate_openai_plugin(root, cfg, args.version))
 
     if errors:
         print("VALIDATION: FAIL")

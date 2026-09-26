@@ -1,0 +1,103 @@
+schema_version: 1
+project:
+  id: nyhetsbevakaren
+  name: Nyhetsbevakaren
+  stable_product_version: 1.0.0
+
+migration:
+  target_builder_version: 1.5.0
+  strategy: behavior_preserving
+  plan: docs/migration-gpt-builder-1.5.0.md
+  total_steps: 9
+
+progress:
+  current_step: 9
+  last_completed_step: 9
+  completed_steps:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+  skipped_steps: []
+  inserted_steps: []
+
+state:
+  overall: pass
+  blocking_issues: []
+  warnings: []
+
+preservation:
+  canonical_instruction: src/instructions/system.md
+  product_plan: docs/development-plan.md
+  existing_status: project-status.yaml
+  existing_runtimes:
+    - chat_zip
+    - custom_gpt
+  preserve_evals: true
+  preserve_knowledge: true
+
+contracts:
+  capabilities: schemas/capability-contract.schema.json
+  artifacts: schemas/artifact-contract.schema.json
+  state: schemas/state-contract.schema.json
+  tools: schemas/tool-contract.schema.json
+  validation: scripts/validate_platform_contracts.py
+  web_research_required: true
+  persistent_workspace_required: false
+  conversation_state_authoritative: false
+  scheduling_action_optional: true
+
+quality:
+  news_robustness_validation: scripts/validate_news_robustness.py
+  release_readiness_validation: scripts/validate_release_readiness.py
+  validates:
+    - freshness
+    - source_quality
+    - event_deduplication
+    - uncertainty
+    - political_neutrality
+    - scheduling_portability
+    - tracked_file_hygiene
+    - five_runtime_set
+
+build:
+  runtime_selection: status_active
+  artifact_names_from_project_config: true
+  project_artifact_declarative: true
+  legacy_targets_supported: true
+  existing_artifact_compatibility_preserved: true
+  active_user_runtimes:
+    - chat_zip
+    - custom_gpt
+    - claude_projects
+    - opencode
+    - openai_plugin
+
+release:
+  version_source: github_release_tag
+  runtime_asset_selection: active_runtimes
+  metadata:
+    - SHA256SUMS.txt
+    - DELIVERY-MANIFEST.json
+  validation: scripts/validate_release_assets.py
+  wildcard_upload: false
+
+next_step:
+  recommended: merge
+  title: Merge och nästa stabila release
+  reason: "Migreringen till GPT Byggaren 1.5.0 är komplett. Fem runtimes byggs och valideras, research- och robusthetskontraktet är bevarat och releaseflödet är deklarativt."
+
+resume:
+  supported: true
+  required_files:
+    - gpt-project.yaml
+    - migration-status.yaml
+    - docs/migration-gpt-builder-1.5.0.md
+    - project-status.yaml
+    - docs/development-plan.md
+  human_readable_status: "Migreringen till GPT Byggaren 1.5.0 är klar. PR kan mergas när CI är grön."
