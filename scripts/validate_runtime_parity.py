@@ -75,12 +75,29 @@ def main() -> int:
     if cfg["runtime"].get("opencode", {}).get("status") == "active" and opencode_files != canonical_files:
         errors.append(f"OpenCode Knowledge differs from canonical: expected={sorted(canonical_files)}, actual={sorted(opencode_files)}")
 
+    plugin_cfg = cfg["runtime"].get("openai_plugin", {})
+    if plugin_cfg.get("status") == "active":
+        plugin_root = root / "build/openai-plugin" / plugin_cfg["manifest"]["name"]
+        skill = plugin_root / "skills" / plugin_cfg["skill"]["id"] / "SKILL.md"
+        if not skill.exists():
+            errors.append("OpenAI Plugin skill missing")
+        else:
+            skill_text = skill.read_text(encoding="utf-8")
+            if canonical.strip() not in skill_text:
+                errors.append("OpenAI Plugin does not contain canonical instruction")
+        plugin_k = plugin_root / "skills" / plugin_cfg["skill"]["id"] / "references" / "knowledge"
+        plugin_files = files_under(plugin_k)
+        if plugin_files != canonical_files:
+            errors.append(f"OpenAI Plugin Knowledge differs from canonical: expected={sorted(canonical_files)}, actual={sorted(plugin_files)}")
+    else:
+        plugin_files = set()
+
     parity_doc = root / "docs/runtime-parity.md"
     if not parity_doc.exists():
         errors.append("Missing docs/runtime-parity.md")
     else:
         doc = parity_doc.read_text(encoding="utf-8")
-        for phrase in ["Webbsökning", "Schemaläggning", "Händelsebaserad deduplicering", "Custom GPT", "Chat ZIP", "Claude Projects", "OpenCode"]:
+        for phrase in ["Webbsökning", "Schemaläggning", "Händelsebaserad deduplicering", "Custom GPT", "Chat ZIP", "Claude Projects", "OpenCode", "OpenAI Plugin"]:
             if phrase not in doc:
                 errors.append(f"Runtime parity report missing section marker: {phrase}")
 
@@ -92,7 +109,7 @@ def main() -> int:
 
     print("RUNTIME PARITY: PASS")
     print(f"Core markers: {len(markers)}")
-    print(f"Knowledge files: canonical={len(canonical_files)} chat={len(chat_files)} custom={len(custom_files)} claude={len(claude_files)} opencode={len(opencode_files)}")
+    print(f"Knowledge files: canonical={len(canonical_files)} chat={len(chat_files)} custom={len(custom_files)} claude={len(claude_files)} opencode={len(opencode_files)} plugin={len(plugin_files)}")
     return 0
 
 
