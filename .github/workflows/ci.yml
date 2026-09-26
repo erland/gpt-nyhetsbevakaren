@@ -30,3 +30,6 @@ jobs:
 
       - name: Validate eval suite
         run: python scripts/validate_evals.py --project-root .
+
+      - name: Validate final release readiness
+        run: python scripts/validate_release_readiness.py
