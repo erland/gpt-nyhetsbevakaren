@@ -1,0 +1,15 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"State Contract",
+  "type":"object",
+  "required":["contract_version","persistent_workspace_required","conversation_state","portable_state","source_of_truth"],
+  "properties":{
+    "contract_version":{"type":"integer","const":1},
+    "schema":{"type":"string"},
+    "persistent_workspace_required":{"type":"boolean"},
+    "conversation_state":{"type":"object","required":["allowed","authoritative"]},
+    "portable_state":{"type":"object","minProperties":1},
+    "source_of_truth":{"type":"object","required":["instruction","knowledge","evals"]}
+  },
+  "additionalProperties":false
+}
