@@ -81,3 +81,17 @@ testing:
   eval_case_schema: schemas/eval-case.schema.json
   e2e_schema: schemas/e2e-news-scenario.schema.json
   validation_script: scripts/validate_evals.py
+
+migration:
+  target_builder_version: 1.5.0
+  strategy: behavior_preserving
+  plan: docs/migration-gpt-builder-1.5.0.md
+  status: migration-status.yaml
+  preserve:
+    canonical_instruction: src/instructions/system.md
+    product_plan: docs/development-plan.md
+    product_status: project-status.yaml
+    evals: true
+    knowledge: true
+  current_distribution_count: 2
+  target_distribution_count: 5
