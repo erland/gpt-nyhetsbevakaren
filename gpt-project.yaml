@@ -168,10 +168,23 @@ runtime:
   primary: none
   chat_zip:
     enabled: true
+    status: active
+    adapter_id: chat_zip
+    build_target: chat
+    artifact_name: nyhetsbevakaren-chat-{version}.zip
     entrypoint: START-HERE.md
     start_here_template: templates/START-HERE.chat.md.tpl
+    source:
+      instructions: src/instructions/system.md
+      knowledge: knowledge
+      conversation_starters: src/conversation-starters
+      runtime_policy: src/runtime-policy
   custom_gpt:
     enabled: true
+    status: active
+    adapter_id: custom_gpt
+    build_target: custom-gpt
+    artifact_name: nyhetsbevakaren-custom-gpt-{version}.zip
     instruction:
       mode: compiled
       max_characters: 8000
@@ -182,6 +195,34 @@ runtime:
       capabilities: templates/capabilities.md.tpl
       readme: templates/README.custom-gpt.md.tpl
       compatibility: templates/COMPATIBILITY.md.tpl
+    source:
+      instructions: src/instructions/system.md
+      knowledge: knowledge
+      conversation_starters: src/conversation-starters
+  claude_projects:
+    status: planned
+  opencode:
+    status: planned
+  openai_plugin:
+    status: planned
+
+build_system:
+  current:
+    script: scripts/build_distributions.py
+    validation_script: scripts/validate_distributions.py
+    runtime_selection: status_active
+    project_artifact:
+      enabled: true
+      artifact_name: nyhetsbevakaren-project.zip
+    compatibility_mode: preserve_existing_artifact_names_and_layout
+  migration_target:
+    runtimes:
+      - chat_zip
+      - custom_gpt
+      - claude_projects
+      - opencode
+      - openai_plugin
+
 development:
   plan: docs/development-plan.md
   status: project-status.yaml
