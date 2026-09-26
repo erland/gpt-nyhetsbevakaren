@@ -152,7 +152,7 @@ def validate_opencode(root: Path, cfg: dict) -> list[str]:
     return errors
 
 
-def validate_openai_plugin(root: Path, cfg: dict) -> list[str]:
+def validate_openai_plugin(root: Path, cfg: dict, version: str) -> list[str]:
     errors=[]
     build=root/"build"/"openai-plugin"
     rcfg=cfg["runtime"]["openai_plugin"]
@@ -170,8 +170,8 @@ def validate_openai_plugin(root: Path, cfg: dict) -> list[str]:
         errors.append("OpenAI Plugin uses wrong Agent Plugins schema")
     if manifest.get("name")!=rcfg["manifest"]["name"]:
         errors.append("OpenAI Plugin name mismatch")
-    if manifest.get("version")!="0.0.0-ci":
-        errors.append(f"OpenAI Plugin version mismatch: {manifest.get('version')}")
+    if manifest.get("version")!=version:
+        errors.append(f"OpenAI Plugin version mismatch: {manifest.get('version')} != {version}")
 
     skill=plugin_root/"skills"/rcfg["skill"]["id"]/"SKILL.md"
     if not skill.exists():
@@ -199,13 +199,13 @@ def validate_openai_plugin(root: Path, cfg: dict) -> list[str]:
     return errors
 
 
-def validate_declared_artifacts(root: Path, cfg: dict) -> list[str]:
+def validate_declared_artifacts(root: Path, cfg: dict, version: str) -> list[str]:
     errors=[]
     dist=root/"dist"
     expected=set()
     project_artifact=cfg.get("build_system",{}).get("current",{}).get("project_artifact",{})
     if project_artifact.get("enabled"):
-        expected.add(project_artifact["artifact_name"].format(version="0.0.0-ci"))
+        expected.add(project_artifact["artifact_name"].format(version=version))
     for runtime_id,rcfg in (cfg.get("runtime") or {}).items():
         if not isinstance(rcfg,dict) or rcfg.get("status")!="active":
             continue
@@ -213,7 +213,7 @@ def validate_declared_artifacts(root: Path, cfg: dict) -> list[str]:
         if not pattern:
             errors.append(f"Active runtime missing artifact_name: {runtime_id}")
             continue
-        expected.add(pattern.format(version="0.0.0-ci"))
+        expected.add(pattern.format(version=version))
     actual={p.name for p in dist.glob("*.zip")} if dist.exists() else set()
     if actual!=expected:
         errors.append(f"Declared artifact mismatch: actual={sorted(actual)} expected={sorted(expected)}")
@@ -223,13 +223,14 @@ def validate_declared_artifacts(root: Path, cfg: dict) -> list[str]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--project-root", default=".")
+    parser.add_argument("--version", default="0.0.0-ci")
     args = parser.parse_args()
 
     root = Path(args.project_root).resolve()
     cfg = load_cfg(root)
 
     errors = []
-    errors.extend(validate_declared_artifacts(root, cfg))
+    errors.extend(validate_declared_artifacts(root, cfg, args.version))
     errors.extend(validate_chat(root, cfg))
     if cfg["runtime"]["custom_gpt"]["enabled"]:
         errors.extend(validate_custom(root, cfg))
@@ -238,7 +239,7 @@ def main() -> int:
     if cfg["runtime"].get("opencode", {}).get("status") == "active":
         errors.extend(validate_opencode(root, cfg))
     if cfg["runtime"].get("openai_plugin", {}).get("status") == "active":
-        errors.extend(validate_openai_plugin(root, cfg))
+        errors.extend(validate_openai_plugin(root, cfg, args.version))
 
     if errors:
         print("VALIDATION: FAIL")
