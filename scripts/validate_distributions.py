@@ -120,6 +120,38 @@ def validate_claude(root: Path, cfg: dict) -> list[str]:
     return errors
 
 
+def validate_opencode(root: Path, cfg: dict) -> list[str]:
+    errors=[]
+    build=root/"build"/"opencode"
+    if not build.exists():
+        return ["OpenCode build directory missing"]
+
+    required=[
+        build/"START-HERE.md",
+        build/"VERSION",
+        build/"MANIFEST.json",
+        build/"RUNTIME-REQUIREMENTS.md",
+        build/"assistant"/"instructions.md",
+    ]
+    for p in required:
+        if not p.exists():
+            errors.append(f"Missing required OpenCode file: {p.relative_to(build)}")
+
+    rcfg=cfg["runtime"]["opencode"]
+    canonical=(root/rcfg["source"]["instructions"]).read_bytes()
+    instr=build/"assistant"/"instructions.md"
+    if instr.exists() and instr.read_bytes()!=canonical:
+        errors.append("OpenCode instruction is not byte-identical to canonical instruction")
+
+    source_k=root/rcfg["source"]["knowledge"]
+    build_k=build/"knowledge"
+    expected={p.relative_to(source_k).as_posix() for p in source_k.rglob("*") if p.is_file() and p.name!="KNOWLEDGE.md"}
+    actual={p.relative_to(build_k).as_posix() for p in build_k.rglob("*") if p.is_file()} if build_k.exists() else set()
+    if actual!=expected:
+        errors.append(f"OpenCode Knowledge differs from canonical: expected={sorted(expected)}, actual={sorted(actual)}")
+    return errors
+
+
 def validate_declared_artifacts(root: Path, cfg: dict) -> list[str]:
     errors=[]
     dist=root/"dist"
@@ -156,6 +188,8 @@ def main() -> int:
         errors.extend(validate_custom(root, cfg))
     if cfg["runtime"].get("claude_projects", {}).get("status") == "active":
         errors.extend(validate_claude(root, cfg))
+    if cfg["runtime"].get("opencode", {}).get("status") == "active":
+        errors.extend(validate_opencode(root, cfg))
 
     if errors:
         print("VALIDATION: FAIL")
