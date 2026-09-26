@@ -1,0 +1,51 @@
+schema_version: 1
+project:
+  id: nyhetsbevakaren
+  name: Nyhetsbevakaren
+  stable_product_version: 1.0.0
+
+migration:
+  target_builder_version: 1.5.0
+  strategy: behavior_preserving
+  plan: docs/migration-gpt-builder-1.5.0.md
+  total_steps: 9
+
+progress:
+  current_step: 2
+  last_completed_step: 1
+  completed_steps:
+    - 1
+  skipped_steps: []
+  inserted_steps: []
+
+state:
+  overall: warning
+  blocking_issues: []
+  warnings:
+    - "Claude Projects, OpenCode och OpenAI Plugin är ännu inte implementerade."
+    - "Fulla GPT Byggaren 1.5.0 capability-, artifact-, state- och tool-kontrakt återstår."
+
+preservation:
+  canonical_instruction: src/instructions/system.md
+  product_plan: docs/development-plan.md
+  existing_status: project-status.yaml
+  existing_runtimes:
+    - chat_zip
+    - custom_gpt
+  preserve_evals: true
+  preserve_knowledge: true
+
+next_step:
+  recommended: 2
+  title: Inför fulla plattformsneutrala kontrakt
+  reason: "Separat migrationsstatus och plan finns nu. Nästa steg är att modellera capabilities, artifacts, state och tools utan att ändra kärnbeteendet."
+
+resume:
+  supported: true
+  required_files:
+    - gpt-project.yaml
+    - migration-status.yaml
+    - docs/migration-gpt-builder-1.5.0.md
+    - project-status.yaml
+    - docs/development-plan.md
+  human_readable_status: "Steg 1 av 9 i GPT Byggaren 1.5.0-migreringen är klart."
