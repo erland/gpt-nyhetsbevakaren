@@ -218,7 +218,25 @@ runtime:
       scheduling_action: optional
       persistent_state: not_required
   opencode:
-    status: planned
+    status: active
+    adapter_id: opencode
+    build_target: opencode
+    artifact_name: nyhetsbevakaren-opencode-{version}.zip
+    entrypoint: START-HERE.md
+    start_here_template: templates/START-HERE.chat.md.tpl
+    source:
+      instructions: src/instructions/system.md
+      knowledge: knowledge
+      conversation_starters: src/conversation-starters
+      runtime_policy: src/runtime-policy
+    compatibility:
+      web_research: required
+      source_navigation: required
+      file_generation: required_for_phase_3
+      scheduling_action: optional
+      persistent_state: not_required
+      filesystem_read: supported
+      code_execution: not_required
   openai_plugin:
     status: planned
 
