@@ -11,13 +11,14 @@ migration:
   total_steps: 9
 
 progress:
-  current_step: 5
-  last_completed_step: 4
+  current_step: 6
+  last_completed_step: 5
   completed_steps:
     - 1
     - 2
     - 3
     - 4
+    - 5
   skipped_steps: []
   inserted_steps: []
 
@@ -25,7 +26,7 @@ state:
   overall: warning
   blocking_issues: []
   warnings:
-    - "OpenCode och OpenAI Plugin är ännu inte implementerade."
+    - "OpenAI Plugin är ännu inte implementerad."
 
 preservation:
   canonical_instruction: src/instructions/system.md
@@ -58,11 +59,12 @@ build:
     - chat_zip
     - custom_gpt
     - claude_projects
+    - opencode
 
 next_step:
-  recommended: 5
-  title: Lägg till OpenCode
-  reason: "Claude Projects byggs nu deklarativt från samma canonical instruktion och Knowledge-korpus, med webbresearch/source navigation som required och schemaläggning som optional runtime-action. CI och runtime parity passerar."
+  recommended: 6
+  title: Lägg till OpenAI Plugin
+  reason: "OpenCode byggs nu deklarativt från samma canonical instruktion och Knowledge-korpus, med webbresearch/source navigation som required och lokal kodexekvering som icke-nödvändig. CI och runtime parity passerar."
 
 resume:
   supported: true
@@ -72,4 +74,4 @@ resume:
     - docs/migration-gpt-builder-1.5.0.md
     - project-status.yaml
     - docs/development-plan.md
-  human_readable_status: "Steg 1–4 av 9 i GPT Byggaren 1.5.0-migreringen är klara."
+  human_readable_status: "Steg 1–5 av 9 i GPT Byggaren 1.5.0-migreringen är klara."
