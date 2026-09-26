@@ -11,8 +11,8 @@ migration:
   total_steps: 9
 
 progress:
-  current_step: 7
-  last_completed_step: 6
+  current_step: 8
+  last_completed_step: 7
   completed_steps:
     - 1
     - 2
@@ -20,6 +20,7 @@ progress:
     - 4
     - 5
     - 6
+    - 7
   skipped_steps: []
   inserted_steps: []
 
@@ -27,7 +28,7 @@ state:
   overall: warning
   blocking_issues: []
   warnings:
-    - "Tvärgående robustness-, hygiene- och parity-hardening återstår i steg 7."
+    - "CI- och releaseflödet är ännu inte generaliserat för deklarativ publicering av alla fem runtime-assets."
 
 preservation:
   canonical_instruction: src/instructions/system.md
@@ -50,6 +51,18 @@ contracts:
   conversation_state_authoritative: false
   scheduling_action_optional: true
 
+quality:
+  news_robustness_validation: scripts/validate_news_robustness.py
+  validates:
+    - freshness
+    - source_quality
+    - event_deduplication
+    - uncertainty
+    - political_neutrality
+    - scheduling_portability
+    - tracked_file_hygiene
+    - five_runtime_set
+
 build:
   runtime_selection: status_active
   artifact_names_from_project_config: true
@@ -64,9 +77,9 @@ build:
     - openai_plugin
 
 next_step:
-  recommended: 7
-  title: Runtime parity, hygiene och robustness
-  reason: "OpenAI Plugin följer Agent Plugins 1.0 med skills-first-struktur, samma canonical beteende och Knowledge-korpus, utan antagna MCP-/Tasks-integrationer. CI och runtime parity passerar för fem runtimes."
+  recommended: 8
+  title: Generalisera CI och release
+  reason: "Fem runtimes passerar nu platform contracts, hygiene, news robustness, distributionsvalidering, runtime parity och eval suite. Nästa steg är att göra release-publiceringen helt deklarativ för exakt de aktiva runtime-assets som anges i gpt-project.yaml."
 
 resume:
   supported: true
@@ -76,4 +89,4 @@ resume:
     - docs/migration-gpt-builder-1.5.0.md
     - project-status.yaml
     - docs/development-plan.md
-  human_readable_status: "Steg 1–6 av 9 i GPT Byggaren 1.5.0-migreringen är klara."
+  human_readable_status: "Steg 1–7 av 9 i GPT Byggaren 1.5.0-migreringen är klara."
