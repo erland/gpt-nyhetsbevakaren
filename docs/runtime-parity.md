@@ -2,11 +2,11 @@
 
 ## Mål
 
-Chat ZIP och Custom GPT ska ge samma kärnbeteende för Nyhetsbevakaren. Skillnader får endast bero på respektive körmiljös sätt att bära instruktioner, Knowledge och verktyg.
+Chat ZIP, Custom GPT och Claude Projects ska ge samma kärnbeteende för Nyhetsbevakaren. Skillnader får endast bero på respektive körmiljös sätt att bära instruktioner, Knowledge och verktyg.
 
 ## Gemensamt kärnbeteende
 
-Båda distributionerna ska:
+Samtliga aktiva användarruntimes ska:
 
 - följa flödet **bygg och kvalitetssäkra nyhetsprofil → kör nyhetsbevakning → erbjud återkommande bevakning**,
 - använda aktuell webbsökning när värdmiljön erbjuder webbåtkomst,
@@ -20,15 +20,15 @@ Båda distributionerna ska:
 
 ## Plattformsskillnader
 
-| Område | Chat ZIP | Custom GPT | Paritetsbedömning |
-|---|---|---|---|
-| Canonical instruktion | Levereras som `assistant/instructions.md` | Kompileras till `builder/instructions.md` | Likvärdig kärnlogik |
-| Knowledge | Samtliga runtime-relevanta Knowledge-filer medföljer ZIP | Valda Knowledge-filer laddas upp i Builder | Likvärdig med nuvarande 7 filer |
-| Webbsökning | Beror på att aktuell ChatGPT-körmiljö har webbåtkomst | Web browsing måste vara aktiverat i GPT Builder | Samma krav, olika aktivering |
-| Scheman/script/mallar | Kan medfölja som filer i ZIP och användas som stöd | Ingår inte som körbar runtime-logik; Builder-paketet fokuserar instruktion + Knowledge | Reducerad artefakttillgång, ej kärnbeteende |
-| Samtalsstartare | Medföljer i ZIP-kontexten | Sätts explicit som Builder conversation starters | Likvärdigt |
-| Återkommande körning | Genererar alltid Markdown-fil och kan, när Tasks finns, erbjuda direkt schemaläggning efter godkännande | Genererar samma Markdown-fil; direkt Tasks kan saknas | Samma promptartefakt, capability-beroende action |
-| Persistens mellan körningar | Får inte förutsättas | Får inte förutsättas | Likvärdigt |
+| Område | Chat ZIP | Custom GPT | Claude Projects | Paritetsbedömning |
+|---|---|---|---|---|
+| Canonical instruktion | Levereras som `assistant/instructions.md` | Kompileras till `builder/instructions.md` | Levereras byte-identiskt som `assistant/instructions.md` | Likvärdig kärnlogik |
+| Knowledge | Samtliga runtime-relevanta Knowledge-filer medföljer ZIP | Valda Knowledge-filer laddas upp i Builder | Samtliga canonical Knowledge-filer medföljer | Likvärdig med nuvarande korpus |
+| Webbsökning | Kräver webbåtkomst i körmiljön | Web browsing måste vara aktiverat | Kräver aktuell webbresearch/källöppning i Claude-miljön | Samma krav, olika aktivering |
+| Scheman/script/mallar | Kan medfölja som filer i ZIP och användas som stöd | Ingår inte som körbar runtime-logik | Ingår inte som krav för kärnflödet | Reducerad artefakttillgång påverkar inte kärnbeteende |
+| Samtalsstartare | Medföljer i ZIP-kontexten | Sätts explicit som Builder conversation starters | Medföljer som runtime-underlag | Likvärdigt |
+| Återkommande körning | Genererar alltid Markdown-fil och kan, när Tasks finns, erbjuda direkt schemaläggning efter godkännande | Genererar samma Markdown-fil; direkt Tasks kan saknas | Genererar samma självförsörjande Markdown-prompt; direkt schemaläggning är optional | Samma promptartefakt, capability-beroende action |
+| Persistens mellan körningar | Får inte förutsättas | Får inte förutsättas | Får inte förutsättas | Likvärdigt |
 
 ## Reducerade funktioner i Custom GPT
 
@@ -38,7 +38,7 @@ Om Knowledge-paketet i framtiden överstiger plattformens filgräns måste byggs
 
 ## Schemaläggning
 
-Båda distributionerna genererar samma självförsörjande schemaläggningsprompt som en nedladdningsbar Markdown-fil. Filen är den portabla canonical leveransen.
+Alla tre aktiva användarruntimes genererar samma självförsörjande schemaläggningsprompt som en nedladdningsbar Markdown-fil när filskapande stöds. Filen är den portabla canonical leveransen.
 
 När Chat-värdmiljön erbjuder Scheduled Tasks får Chat-versionen dessutom erbjuda att skapa schemat direkt efter användarens uttryckliga godkännande och då använda exakt samma prompt. Custom GPT eller annan miljö utan denna capability lämnar filen för manuell användning. Direkt schemaläggning är därför en runtime-förbättring, inte en dold förutsättning för kärnbeteendet.
 
