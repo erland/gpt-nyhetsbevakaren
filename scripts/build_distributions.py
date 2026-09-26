@@ -284,6 +284,87 @@ def build_opencode(root: Path, cfg: dict, build_root: Path, version: str) -> Pat
     return out
 
 
+def build_openai_plugin(root: Path, cfg: dict, build_root: Path, version: str) -> Path:
+    out = build_root / "openai-plugin"
+    ensure_clean_dir(out)
+
+    rcfg = cfg["runtime"]["openai_plugin"]
+    plugin_root = out / rcfg["manifest"]["name"]
+    skill_root = plugin_root / "skills" / rcfg["skill"]["id"]
+    refs = skill_root / "references"
+    (refs / "knowledge").mkdir(parents=True, exist_ok=True)
+
+    manifest = {
+        "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+        "name": rcfg["manifest"]["name"],
+        "version": version,
+        "description": rcfg["manifest"]["description"],
+        "author": {"name": "Erland Lindmark"},
+        "extensions": {
+            "com.openai": {
+                "interface": {
+                    "displayName": rcfg["manifest"]["display_name"],
+                    "shortDescription": "Aktuell källkritisk nyhetsbevakning",
+                    "longDescription": rcfg["manifest"]["description"],
+                    "developerName": "Erland Lindmark",
+                    "category": rcfg["manifest"]["category"],
+                    "capabilities": ["Interactive"],
+                    "defaultPrompt": [
+                        "Bygg en nyhetsprofil för mitt ämne.",
+                        "Kör aktuell nyhetsbevakning för den senaste veckan.",
+                        "Skapa en självförsörjande prompt för återkommande bevakning."
+                    ]
+                }
+            }
+        }
+    }
+    (plugin_root / "plugin.json").write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    canonical = (root / rcfg["skill"]["source_instruction"]).read_text(encoding="utf-8").strip()
+    skill_text = (
+        "---\n"
+        f"name: {rcfg['skill']['id']}\n"
+        "description: Bygg nyhetsprofiler, genomför aktuell källkritisk nyhetsbevakning, deduplicera händelser "
+        "och skapa självförsörjande schemaläggningsprompter. Använd när användaren vill bevaka ett ämne eller "
+        "återkommande följa nyheter.\n"
+        "---\n\n"
+        "# Nyhetsbevakaren\n\n"
+        "Aktuell nyhetsbevakning kräver webbresearch och källöppning i värdmiljön. "
+        "Om sådan capability saknas får aktuell information inte ersättas med minnesbaserade påståenden.\n\n"
+        "## Runtime-regler\n\n"
+        "- Persistent workspace-state krävs inte.\n"
+        "- Tidigare chatt får inte vara enda sanningskälla för återkommande bevakning.\n"
+        "- I fas 3 ska en självförsörjande Markdown-prompt skapas när filskapande stöds.\n"
+        "- Direkt schemaläggning är optional och får endast användas när värdmiljön faktiskt stöder det.\n"
+        "- Ingen MCP- eller extern integration antas finnas.\n"
+        "- Lokal scriptkörning är inte en förutsättning för kärnflödet.\n\n"
+        "## Kanoniskt beteendekontrakt\n\n"
+        + canonical + "\n"
+    )
+    (skill_root / "SKILL.md").write_text(skill_text, encoding="utf-8")
+
+    knowledge_root = root / rcfg["skill"]["knowledge"]
+    for p in sorted(knowledge_root.rglob("*")):
+        if p.is_file() and p.name != "KNOWLEDGE.md":
+            copy_file(p, refs / "knowledge" / p.relative_to(knowledge_root))
+
+    policy_root = root / rcfg["skill"]["runtime_policy"]
+    if policy_root.exists():
+        copy_tree_filtered(policy_root, refs / "runtime-policy")
+
+    starters_root = root / rcfg["skill"]["conversation_starters"]
+    if starters_root.exists():
+        copy_tree_filtered(starters_root, refs / "conversation-starters")
+
+    eval_manifest = root / rcfg["skill"]["eval_manifest"]
+    copy_file(eval_manifest, refs / "test-manifest.yaml")
+
+    return out
+
+
 def _knowledge_priority_patterns(cfg: dict) -> list[str]:
     return list(cfg.get("knowledge_architecture", {}).get("custom_gpt", {}).get("priority", []) or [])
 
@@ -544,6 +625,11 @@ def main() -> int:
         opencode_root = build_opencode(root, cfg, build_root, version)
         opencode_zip = dist / runtime_artifact_name(cfg, "opencode", version)
         stable_write_zip(opencode_zip, opencode_root, [p for p in opencode_root.rglob("*") if p.is_file()])
+
+    if "openai-plugin" in targets:
+        plugin_root = build_openai_plugin(root, cfg, build_root, version)
+        plugin_zip = dist / runtime_artifact_name(cfg, "openai_plugin", version)
+        stable_write_zip(plugin_zip, plugin_root, [p for p in plugin_root.rglob("*") if p.is_file()])
 
     if "custom-gpt" in targets and cfg["runtime"]["custom_gpt"]["enabled"]:
         custom_root = build_custom(root, cfg, build_root, version)
