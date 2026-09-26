@@ -2,7 +2,7 @@
 
 ## Mål
 
-Chat ZIP, Custom GPT, Claude Projects och OpenCode ska ge samma kärnbeteende för Nyhetsbevakaren. Skillnader får endast bero på respektive körmiljös sätt att bära instruktioner, Knowledge och verktyg.
+Chat ZIP, Custom GPT, Claude Projects, OpenCode och OpenAI Plugin ska ge samma kärnbeteende för Nyhetsbevakaren. Skillnader får endast bero på respektive körmiljös sätt att bära instruktioner, Knowledge och verktyg.
 
 ## Gemensamt kärnbeteende
 
@@ -20,15 +20,15 @@ Samtliga aktiva användarruntimes ska:
 
 ## Plattformsskillnader
 
-| Område | Chat ZIP | Custom GPT | Claude Projects | OpenCode | Paritetsbedömning |
-|---|---|---|---|---|---|
-| Canonical instruktion | Levereras som `assistant/instructions.md` | Kompileras till `builder/instructions.md` | Levereras byte-identiskt som `assistant/instructions.md` | Levereras byte-identiskt som `assistant/instructions.md` | Likvärdig kärnlogik |
-| Knowledge | Samtliga runtime-relevanta Knowledge-filer medföljer ZIP | Valda Knowledge-filer laddas upp i Builder | Samtliga canonical Knowledge-filer medföljer | Samtliga canonical Knowledge-filer medföljer | Likvärdig med nuvarande korpus |
-| Webbsökning | Kräver webbåtkomst i körmiljön | Web browsing måste vara aktiverat | Kräver aktuell webbresearch/källöppning i Claude-miljön | Kräver aktuell webbresearch/källöppning i OpenCode-värdmiljön | Samma krav, olika aktivering |
-| Scheman/script/mallar | Kan medfölja som filer i ZIP och användas som stöd | Ingår inte som körbar runtime-logik | Ingår inte som krav för kärnflödet | Lokal kodexekvering kan finnas men krävs inte för kärnflödet | Reducerad artefakttillgång påverkar inte kärnbeteende |
-| Samtalsstartare | Medföljer i ZIP-kontexten | Sätts explicit som Builder conversation starters | Medföljer som runtime-underlag | Medföljer som runtime-underlag | Likvärdigt |
-| Återkommande körning | Genererar alltid Markdown-fil och kan, när Tasks finns, erbjuda direkt schemaläggning efter godkännande | Genererar samma Markdown-fil; direkt Tasks kan saknas | Genererar samma självförsörjande Markdown-prompt; direkt schemaläggning är optional | Genererar samma självförsörjande Markdown-prompt; direkt schemaläggning är optional | Samma promptartefakt, capability-beroende action |
-| Persistens mellan körningar | Får inte förutsättas | Får inte förutsättas | Får inte förutsättas | Får inte förutsättas | Likvärdigt |
+| Område | Chat ZIP | Custom GPT | Claude Projects | OpenCode | OpenAI Plugin | Paritetsbedömning |
+|---|---|---|---|---|---|---|
+| Canonical instruktion | Levereras som `assistant/instructions.md` | Kompileras till `builder/instructions.md` | Levereras byte-identiskt som `assistant/instructions.md` | Levereras byte-identiskt som `assistant/instructions.md` | Bäddas in i skills-first `SKILL.md` | Likvärdig kärnlogik |
+| Knowledge | Samtliga runtime-relevanta Knowledge-filer medföljer ZIP | Valda Knowledge-filer laddas upp i Builder | Samtliga canonical Knowledge-filer medföljer | Samtliga canonical Knowledge-filer medföljer | Samtliga canonical Knowledge-filer medföljer under skill-referenser | Likvärdig med nuvarande korpus |
+| Webbsökning | Kräver webbåtkomst i körmiljön | Web browsing måste vara aktiverat | Kräver aktuell webbresearch/källöppning i Claude-miljön | Kräver aktuell webbresearch/källöppning i OpenCode-värdmiljön | Kräver att plugin-värdmiljön faktiskt erbjuder webbresearch/källöppning | Samma krav, olika aktivering |
+| Scheman/script/mallar | Kan medfölja som filer i ZIP och användas som stöd | Ingår inte som körbar runtime-logik | Ingår inte som krav för kärnflödet | Lokal kodexekvering kan finnas men krävs inte för kärnflödet | Pluginen antar varken MCP, Tasks eller scriptkörning | Reducerad artefakttillgång påverkar inte kärnbeteende |
+| Samtalsstartare | Medföljer i ZIP-kontexten | Sätts explicit som Builder conversation starters | Medföljer som runtime-underlag | Medföljer som runtime-underlag | Medföljer som referensunderlag till skillen | Likvärdigt |
+| Återkommande körning | Genererar alltid Markdown-fil och kan, när Tasks finns, erbjuda direkt schemaläggning efter godkännande | Genererar samma Markdown-fil; direkt Tasks kan saknas | Genererar samma självförsörjande Markdown-prompt; direkt schemaläggning är optional | Genererar samma självförsörjande Markdown-prompt; direkt schemaläggning är optional | Genererar samma självförsörjande Markdown-prompt; direkt schemaläggning används endast om capability faktiskt finns | Samma promptartefakt, capability-beroende action |
+| Persistens mellan körningar | Får inte förutsättas | Får inte förutsättas | Får inte förutsättas | Får inte förutsättas | Får inte förutsättas | Likvärdigt |
 
 ## Reducerade funktioner i Custom GPT
 
@@ -38,7 +38,7 @@ Om Knowledge-paketet i framtiden överstiger plattformens filgräns måste byggs
 
 ## Schemaläggning
 
-Alla fyra aktiva användarruntimes genererar samma självförsörjande schemaläggningsprompt som en nedladdningsbar Markdown-fil när filskapande stöds. Filen är den portabla canonical leveransen.
+Alla fem aktiva användarruntimes genererar samma självförsörjande schemaläggningsprompt som en nedladdningsbar Markdown-fil när filskapande stöds. Filen är den portabla canonical leveransen.
 
 När Chat-värdmiljön erbjuder Scheduled Tasks får Chat-versionen dessutom erbjuda att skapa schemat direkt efter användarens uttryckliga godkännande och då använda exakt samma prompt. Custom GPT eller annan miljö utan denna capability lämnar filen för manuell användning. Direkt schemaläggning är därför en runtime-förbättring, inte en dold förutsättning för kärnbeteendet.
 
