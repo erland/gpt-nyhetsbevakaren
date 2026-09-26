@@ -30,15 +30,18 @@ def main() -> int:
     chat_path = root / "build/chat/assistant/instructions.md"
     custom_path = root / "build/custom-gpt/builder/instructions.md"
     claude_path = root / "build/claude-projects/assistant/instructions.md"
+    opencode_path = root / "build/opencode/assistant/instructions.md"
     if not chat_path.exists():
         errors.append("Chat instruction missing")
     if not custom_path.exists():
         errors.append("Custom GPT instruction missing")
     if cfg["runtime"].get("claude_projects", {}).get("status") == "active" and not claude_path.exists():
         errors.append("Claude Projects instruction missing")
+    if cfg["runtime"].get("opencode", {}).get("status") == "active" and not opencode_path.exists():
+        errors.append("OpenCode instruction missing")
 
     markers = list(cfg.get("instructions", {}).get("core_contract", {}).get("required_markers", []) or [])
-    for label, path in [("canonical", canonical_path), ("chat", chat_path), ("custom", custom_path), ("claude", claude_path)]:
+    for label, path in [("canonical", canonical_path), ("chat", chat_path), ("custom", custom_path), ("claude", claude_path), ("opencode", opencode_path)]:
         if not path.exists():
             continue
         text = path.read_text(encoding="utf-8")
@@ -50,28 +53,34 @@ def main() -> int:
         errors.append("Chat instruction is not byte-identical to canonical instruction")
     if claude_path.exists() and claude_path.read_text(encoding="utf-8") != canonical:
         errors.append("Claude Projects instruction is not byte-identical to canonical instruction")
+    if opencode_path.exists() and opencode_path.read_text(encoding="utf-8") != canonical:
+        errors.append("OpenCode instruction is not byte-identical to canonical instruction")
 
     canonical_k = root / cfg["knowledge_architecture"]["canonical_root"]
     chat_k = root / "build/chat/knowledge"
     custom_k = root / "build/custom-gpt/builder/knowledge-package"
     claude_k = root / "build/claude-projects/knowledge"
+    opencode_k = root / "build/opencode/knowledge"
     canonical_files = files_under(canonical_k) - {"KNOWLEDGE.md"}
     chat_files = files_under(chat_k)
     custom_files = files_under(custom_k)
     claude_files = files_under(claude_k)
+    opencode_files = files_under(opencode_k)
     if chat_files != canonical_files:
         errors.append(f"Chat Knowledge differs from canonical: expected={sorted(canonical_files)}, actual={sorted(chat_files)}")
     if len(canonical_files) <= int(cfg["runtime"]["custom_gpt"]["knowledge"]["max_files"]) and custom_files != canonical_files:
         errors.append(f"Custom GPT Knowledge should include all canonical files: expected={sorted(canonical_files)}, actual={sorted(custom_files)}")
     if cfg["runtime"].get("claude_projects", {}).get("status") == "active" and claude_files != canonical_files:
         errors.append(f"Claude Projects Knowledge differs from canonical: expected={sorted(canonical_files)}, actual={sorted(claude_files)}")
+    if cfg["runtime"].get("opencode", {}).get("status") == "active" and opencode_files != canonical_files:
+        errors.append(f"OpenCode Knowledge differs from canonical: expected={sorted(canonical_files)}, actual={sorted(opencode_files)}")
 
     parity_doc = root / "docs/runtime-parity.md"
     if not parity_doc.exists():
         errors.append("Missing docs/runtime-parity.md")
     else:
         doc = parity_doc.read_text(encoding="utf-8")
-        for phrase in ["Webbsökning", "Schemaläggning", "Händelsebaserad deduplicering", "Custom GPT", "Chat ZIP", "Claude Projects"]:
+        for phrase in ["Webbsökning", "Schemaläggning", "Händelsebaserad deduplicering", "Custom GPT", "Chat ZIP", "Claude Projects", "OpenCode"]:
             if phrase not in doc:
                 errors.append(f"Runtime parity report missing section marker: {phrase}")
 
@@ -83,7 +92,7 @@ def main() -> int:
 
     print("RUNTIME PARITY: PASS")
     print(f"Core markers: {len(markers)}")
-    print(f"Knowledge files: canonical={len(canonical_files)} chat={len(chat_files)} custom={len(custom_files)} claude={len(claude_files)}")
+    print(f"Knowledge files: canonical={len(canonical_files)} chat={len(chat_files)} custom={len(custom_files)} claude={len(claude_files)} opencode={len(opencode_files)}")
     return 0
 
 
