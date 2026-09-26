@@ -88,6 +88,27 @@ def validate_chat(root: Path, cfg: dict) -> list[str]:
     return errors
 
 
+def validate_declared_artifacts(root: Path, cfg: dict) -> list[str]:
+    errors=[]
+    dist=root/"dist"
+    expected=set()
+    project_artifact=cfg.get("build_system",{}).get("current",{}).get("project_artifact",{})
+    if project_artifact.get("enabled"):
+        expected.add(project_artifact["artifact_name"].format(version="0.0.0-ci"))
+    for runtime_id,rcfg in (cfg.get("runtime") or {}).items():
+        if not isinstance(rcfg,dict) or rcfg.get("status")!="active":
+            continue
+        pattern=rcfg.get("artifact_name")
+        if not pattern:
+            errors.append(f"Active runtime missing artifact_name: {runtime_id}")
+            continue
+        expected.add(pattern.format(version="0.0.0-ci"))
+    actual={p.name for p in dist.glob("*.zip")} if dist.exists() else set()
+    if actual!=expected:
+        errors.append(f"Declared artifact mismatch: actual={sorted(actual)} expected={sorted(expected)}")
+    return errors
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--project-root", default=".")
@@ -97,6 +118,7 @@ def main() -> int:
     cfg = load_cfg(root)
 
     errors = []
+    errors.extend(validate_declared_artifacts(root, cfg))
     errors.extend(validate_chat(root, cfg))
     if cfg["runtime"]["custom_gpt"]["enabled"]:
         errors.extend(validate_custom(root, cfg))
