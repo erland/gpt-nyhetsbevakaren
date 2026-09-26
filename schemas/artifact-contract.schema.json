@@ -1,0 +1,25 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"Artifact Contract",
+  "type":"object",
+  "required":["contract_version","outputs"],
+  "properties":{
+    "contract_version":{"type":"integer","const":1},
+    "schema":{"type":"string"},
+    "outputs":{"type":"object","minProperties":1,"additionalProperties":{
+      "type":"object",
+      "required":["kind","format","requirement","persistence"],
+      "properties":{
+        "kind":{"type":"string"},
+        "format":{"type":"string"},
+        "requirement":{"type":"string"},
+        "condition":{"type":"string"},
+        "persistence":{"type":"string"},
+        "multiplicity":{"enum":["one","many"]},
+        "description":{"type":"string"}
+      },
+      "additionalProperties":false
+    }}
+  },
+  "additionalProperties":false
+}
