@@ -238,7 +238,31 @@ runtime:
       filesystem_read: supported
       code_execution: not_required
   openai_plugin:
-    status: planned
+    status: active
+    adapter_id: openai_plugin
+    build_target: openai-plugin
+    artifact_name: nyhetsbevakaren-openai-plugin-{version}.zip
+    manifest:
+      name: nyhetsbevakaren
+      display_name: Nyhetsbevakaren
+      description: "Bygg och kör aktuell ämnesbaserad nyhetsbevakning med källkritik, händelsebaserad deduplicering och portabel schemaläggningsprompt."
+      category: Productivity
+    skill:
+      id: nyhetsbevakaren
+      source_instruction: src/instructions/system.md
+      knowledge: knowledge
+      runtime_policy: src/runtime-policy
+      conversation_starters: src/conversation-starters
+      eval_manifest: evals/test-manifest.yaml
+    compatibility:
+      architecture: skills_first
+      web_research: required
+      source_navigation: required
+      file_generation: required_for_phase_3
+      scheduling_action: optional
+      external_integrations: none
+      persistent_state: not_required
+      bundled_script_execution: not_assumed
 
 build_system:
   current:
