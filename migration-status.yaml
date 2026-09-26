@@ -11,8 +11,8 @@ migration:
   total_steps: 9
 
 progress:
-  current_step: 8
-  last_completed_step: 7
+  current_step: 9
+  last_completed_step: 8
   completed_steps:
     - 1
     - 2
@@ -21,6 +21,7 @@ progress:
     - 5
     - 6
     - 7
+    - 8
   skipped_steps: []
   inserted_steps: []
 
@@ -28,7 +29,7 @@ state:
   overall: warning
   blocking_issues: []
   warnings:
-    - "CI- och releaseflödet är ännu inte generaliserat för deklarativ publicering av alla fem runtime-assets."
+    - "Slutlig release-readiness och dokumentationssynk återstår i steg 9."
 
 preservation:
   canonical_instruction: src/instructions/system.md
@@ -76,10 +77,19 @@ build:
     - opencode
     - openai_plugin
 
+release:
+  version_source: github_release_tag
+  runtime_asset_selection: active_runtimes
+  metadata:
+    - SHA256SUMS.txt
+    - DELIVERY-MANIFEST.json
+  validation: scripts/validate_release_assets.py
+  wildcard_upload: false
+
 next_step:
-  recommended: 8
-  title: Generalisera CI och release
-  reason: "Fem runtimes passerar nu platform contracts, hygiene, news robustness, distributionsvalidering, runtime parity och eval suite. Nästa steg är att göra release-publiceringen helt deklarativ för exakt de aktiva runtime-assets som anges i gpt-project.yaml."
+  recommended: 9
+  title: Slutlig release-readiness
+  reason: "CI och release är nu generaliserade för deklarativ build/validation och exakt publicering av de fem aktiva runtime-assets som anges i gpt-project.yaml, plus checksummor och delivery manifest."
 
 resume:
   supported: true
@@ -89,4 +99,4 @@ resume:
     - docs/migration-gpt-builder-1.5.0.md
     - project-status.yaml
     - docs/development-plan.md
-  human_readable_status: "Steg 1–7 av 9 i GPT Byggaren 1.5.0-migreringen är klara."
+  human_readable_status: "Steg 1–8 av 9 i GPT Byggaren 1.5.0-migreringen är klara."
