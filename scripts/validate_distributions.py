@@ -88,6 +88,38 @@ def validate_chat(root: Path, cfg: dict) -> list[str]:
     return errors
 
 
+def validate_claude(root: Path, cfg: dict) -> list[str]:
+    errors=[]
+    build=root/"build"/"claude-projects"
+    if not build.exists():
+        return ["Claude Projects build directory missing"]
+
+    required=[
+        build/"START-HERE.md",
+        build/"VERSION",
+        build/"MANIFEST.json",
+        build/"RUNTIME-REQUIREMENTS.md",
+        build/"assistant"/"instructions.md",
+    ]
+    for p in required:
+        if not p.exists():
+            errors.append(f"Missing required Claude file: {p.relative_to(build)}")
+
+    rcfg=cfg["runtime"]["claude_projects"]
+    canonical=(root/rcfg["source"]["instructions"]).read_bytes()
+    instr=build/"assistant"/"instructions.md"
+    if instr.exists() and instr.read_bytes()!=canonical:
+        errors.append("Claude instruction is not byte-identical to canonical instruction")
+
+    source_k=root/rcfg["source"]["knowledge"]
+    build_k=build/"knowledge"
+    expected={p.relative_to(source_k).as_posix() for p in source_k.rglob("*") if p.is_file() and p.name!="KNOWLEDGE.md"}
+    actual={p.relative_to(build_k).as_posix() for p in build_k.rglob("*") if p.is_file()} if build_k.exists() else set()
+    if actual!=expected:
+        errors.append(f"Claude Knowledge differs from canonical: expected={sorted(expected)}, actual={sorted(actual)}")
+    return errors
+
+
 def validate_declared_artifacts(root: Path, cfg: dict) -> list[str]:
     errors=[]
     dist=root/"dist"
@@ -122,6 +154,8 @@ def main() -> int:
     errors.extend(validate_chat(root, cfg))
     if cfg["runtime"]["custom_gpt"]["enabled"]:
         errors.extend(validate_custom(root, cfg))
+    if cfg["runtime"].get("claude_projects", {}).get("status") == "active":
+        errors.extend(validate_claude(root, cfg))
 
     if errors:
         print("VALIDATION: FAIL")
