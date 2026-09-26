@@ -200,7 +200,23 @@ runtime:
       knowledge: knowledge
       conversation_starters: src/conversation-starters
   claude_projects:
-    status: planned
+    status: active
+    adapter_id: claude_projects
+    build_target: claude-projects
+    artifact_name: nyhetsbevakaren-claude-projects-{version}.zip
+    entrypoint: START-HERE.md
+    start_here_template: templates/START-HERE.chat.md.tpl
+    source:
+      instructions: src/instructions/system.md
+      knowledge: knowledge
+      conversation_starters: src/conversation-starters
+      runtime_policy: src/runtime-policy
+    compatibility:
+      web_research: required
+      source_navigation: required
+      file_generation: required_for_phase_3
+      scheduling_action: optional
+      persistent_state: not_required
   opencode:
     status: planned
   openai_plugin:
