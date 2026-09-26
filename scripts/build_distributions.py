@@ -27,6 +27,27 @@ def load_config(root: Path) -> dict:
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
+def active_runtime_targets(cfg: dict) -> set[str]:
+    targets=set()
+    for runtime_id, rcfg in (cfg.get("runtime") or {}).items():
+        if not isinstance(rcfg, dict) or rcfg.get("status") != "active":
+            continue
+        target=rcfg.get("build_target")
+        if target:
+            targets.add(target)
+    return targets
+
+
+def runtime_artifact_name(cfg: dict, runtime_id: str, version: str) -> str:
+    rcfg=(cfg.get("runtime") or {}).get(runtime_id)
+    if not isinstance(rcfg, dict):
+        raise SystemExit(f"Missing runtime config: {runtime_id}")
+    pattern=rcfg.get("artifact_name")
+    if not pattern:
+        raise SystemExit(f"Runtime {runtime_id} is missing artifact_name")
+    return pattern.format(version=version)
+
+
 def sha256(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as f:
@@ -387,7 +408,8 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--project-root", default=".")
     parser.add_argument("--version", default="0.0.0-dev")
-    parser.add_argument("--targets", default="project,chat,custom-gpt")
+    parser.add_argument("--targets", default=None,
+                        help="Comma-separated build targets. Default: project plus all active runtimes from gpt-project.yaml")
     args = parser.parse_args()
 
     root = Path(args.project_root).resolve()
@@ -397,22 +419,26 @@ def main() -> int:
     build_root.mkdir(exist_ok=True)
     dist.mkdir(exist_ok=True)
 
-    targets = {t.strip() for t in args.targets.split(",") if t.strip()}
+    if args.targets:
+        targets = {t.strip() for t in args.targets.split(",") if t.strip()}
+    else:
+        targets = {"project"} | active_runtime_targets(cfg)
     project_id = cfg["project"]["id"]
     version = args.version
 
     if "chat" in targets:
         chat_root = build_chat(root, cfg, build_root, version)
-        chat_zip = dist / f"{project_id}-chat-{version}.zip"
+        chat_zip = dist / runtime_artifact_name(cfg, "chat_zip", version)
         stable_write_zip(chat_zip, chat_root, [p for p in chat_root.rglob("*") if p.is_file()])
 
     if "custom-gpt" in targets and cfg["runtime"]["custom_gpt"]["enabled"]:
         custom_root = build_custom(root, cfg, build_root, version)
-        custom_zip = dist / f"{project_id}-custom-gpt-{version}.zip"
+        custom_zip = dist / runtime_artifact_name(cfg, "custom_gpt", version)
         stable_write_zip(custom_zip, custom_root, [p for p in custom_root.rglob("*") if p.is_file()])
 
     if "project" in targets:
-        project_zip = dist / f"{project_id}-project.zip"
+        project_pattern = cfg["build_system"]["current"]["project_artifact"]["artifact_name"]
+        project_zip = dist / project_pattern.format(version=version)
         stable_write_zip(project_zip, root, project_files(root))
 
     write_checksums(dist)
