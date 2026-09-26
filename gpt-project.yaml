@@ -44,6 +44,126 @@ knowledge_architecture:
     - report-format.md
     - scheduling-prompt.md
     - robustness-source-criticism.md
+
+capabilities:
+  contract_version: 1
+  schema: schemas/capability-contract.schema.json
+  recommendation_mode: inferred_from_use_case
+  ask_user_only_when_business_choice_is_ambiguous: true
+  requirements:
+    web_research:
+      level: required
+      reason: "Aktuell nyhetsbevakning kräver färsk webbsökning, källöppning och verifiering."
+    source_navigation:
+      level: required
+      reason: "Källor måste kunna öppnas, verifieras och länkas spårbart."
+    file_generation:
+      level: required_for_phase_3
+      reason: "Schemaläggningsprompten ska kunna levereras som nedladdningsbar Markdown när värdmiljön stöder filskapande."
+    scheduling_action:
+      level: optional
+      reason: "Direkt Scheduled Task är en runtime-förbättring och får aldrig vara ett krav för kärnbeteendet."
+    structured_data:
+      level: recommended
+      reason: "Nyhetsprofilen serialiseras strukturerat och används som stabil konfiguration."
+    code_execution:
+      level: not_required
+      reason: "Kärnflödet kräver inte exekvering av lokala scripts i runtime."
+    persistent_state:
+      level: not_required
+      reason: "Nyhetsprofil och fristående schemaläggningsprompt bär återanvändbar konfiguration mellan körningar."
+    external_tools:
+      level: optional
+      reason: "Kärnflödet ska fungera utan MCP eller leverantörsspecifika externa integrationer."
+
+artifacts:
+  contract_version: 1
+  schema: schemas/artifact-contract.schema.json
+  outputs:
+    news_profile:
+      kind: configuration
+      format: markdown_yaml
+      requirement: required_phase_1
+      persistence: portable
+      multiplicity: one
+      description: "Nyhetsprofil v1 med ämnen, avgränsning, källstrategi, betydelsekriterier och antaganden."
+    news_report:
+      kind: report
+      format: markdown
+      requirement: required_phase_2
+      persistence: ephemeral
+      multiplicity: one
+      description: "Aktuell nyhetsrapport med kvalificerade händelser, sammanfattningar och klickbara källor."
+    scheduling_prompt:
+      kind: prompt
+      format: markdown
+      requirement: required_phase_3
+      persistence: portable
+      multiplicity: one
+      description: "Självförsörjande prompt för återkommande bevakning utan beroende av tidigare chattminne."
+    uncertainty_note:
+      kind: metadata
+      format: markdown
+      requirement: conditional
+      condition: "conflicting_or_insufficient_evidence"
+      persistence: ephemeral
+      multiplicity: one
+      description: "Tydlig markering av osäker information, konflikt mellan källor eller underlagsbrist."
+
+state:
+  contract_version: 1
+  schema: schemas/state-contract.schema.json
+  persistent_workspace_required: false
+  conversation_state:
+    allowed: true
+    authoritative: false
+  portable_state:
+    news_profile:
+      required_for_reuse: true
+      source: artifact
+    scheduling_prompt:
+      self_contained: true
+      source: artifact
+  source_of_truth:
+    instruction: src/instructions/system.md
+    knowledge: knowledge
+    evals: evals/test-manifest.yaml
+
+tools:
+  contract_version: 1
+  schema: schemas/tool-contract.schema.json
+  tools:
+    - id: web-research
+      type: runtime_capability
+      requirement: required
+      purpose: "Söka, öppna och verifiera aktuella nyhetskällor."
+      deterministic: false
+      mutates_workspace: false
+      runtime_fallback: block_current_news
+    - id: distribution-build
+      type: script
+      requirement: required_development
+      purpose: "Bygga runtime-distributioner."
+      script: scripts/build_distributions.py
+      deterministic: true
+      mutates_workspace: true
+      runtime_fallback: not_applicable
+    - id: distribution-validation
+      type: script
+      requirement: required_development
+      purpose: "Validera runtime-distributioner."
+      script: scripts/validate_distributions.py
+      deterministic: true
+      mutates_workspace: false
+      runtime_fallback: not_applicable
+    - id: eval-suite
+      type: script
+      requirement: required_development
+      purpose: "Validera eval-manifest och scenarier."
+      script: scripts/validate_evals.py
+      deterministic: true
+      mutates_workspace: false
+      runtime_fallback: not_applicable
 runtime:
   primary: none
   chat_zip:
