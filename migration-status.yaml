@@ -12,7 +12,7 @@ migration:
 
 progress:
   current_step: 9
-  last_completed_step: 8
+  last_completed_step: 9
   completed_steps:
     - 1
     - 2
@@ -22,14 +22,14 @@ progress:
     - 6
     - 7
     - 8
+    - 9
   skipped_steps: []
   inserted_steps: []
 
 state:
-  overall: warning
+  overall: pass
   blocking_issues: []
-  warnings:
-    - "Slutlig release-readiness och dokumentationssynk återstår i steg 9."
+  warnings: []
 
 preservation:
   canonical_instruction: src/instructions/system.md
@@ -54,6 +54,7 @@ contracts:
 
 quality:
   news_robustness_validation: scripts/validate_news_robustness.py
+  release_readiness_validation: scripts/validate_release_readiness.py
   validates:
     - freshness
     - source_quality
@@ -87,9 +88,9 @@ release:
   wildcard_upload: false
 
 next_step:
-  recommended: 9
-  title: Slutlig release-readiness
-  reason: "CI och release är nu generaliserade för deklarativ build/validation och exakt publicering av de fem aktiva runtime-assets som anges i gpt-project.yaml, plus checksummor och delivery manifest."
+  recommended: merge
+  title: Merge och nästa stabila release
+  reason: "Migreringen till GPT Byggaren 1.5.0 är komplett. Fem runtimes byggs och valideras, research- och robusthetskontraktet är bevarat och releaseflödet är deklarativt."
 
 resume:
   supported: true
@@ -99,4 +100,4 @@ resume:
     - docs/migration-gpt-builder-1.5.0.md
     - project-status.yaml
     - docs/development-plan.md
-  human_readable_status: "Steg 1–8 av 9 i GPT Byggaren 1.5.0-migreringen är klara."
+  human_readable_status: "Migreringen till GPT Byggaren 1.5.0 är klar. PR kan mergas när CI är grön."
