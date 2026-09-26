@@ -11,14 +11,15 @@ migration:
   total_steps: 9
 
 progress:
-  current_step: 6
-  last_completed_step: 5
+  current_step: 7
+  last_completed_step: 6
   completed_steps:
     - 1
     - 2
     - 3
     - 4
     - 5
+    - 6
   skipped_steps: []
   inserted_steps: []
 
@@ -26,7 +27,7 @@ state:
   overall: warning
   blocking_issues: []
   warnings:
-    - "OpenAI Plugin är ännu inte implementerad."
+    - "Tvärgående robustness-, hygiene- och parity-hardening återstår i steg 7."
 
 preservation:
   canonical_instruction: src/instructions/system.md
@@ -60,11 +61,12 @@ build:
     - custom_gpt
     - claude_projects
     - opencode
+    - openai_plugin
 
 next_step:
-  recommended: 6
-  title: Lägg till OpenAI Plugin
-  reason: "OpenCode byggs nu deklarativt från samma canonical instruktion och Knowledge-korpus, med webbresearch/source navigation som required och lokal kodexekvering som icke-nödvändig. CI och runtime parity passerar."
+  recommended: 7
+  title: Runtime parity, hygiene och robustness
+  reason: "OpenAI Plugin följer Agent Plugins 1.0 med skills-first-struktur, samma canonical beteende och Knowledge-korpus, utan antagna MCP-/Tasks-integrationer. CI och runtime parity passerar för fem runtimes."
 
 resume:
   supported: true
@@ -74,4 +76,4 @@ resume:
     - docs/migration-gpt-builder-1.5.0.md
     - project-status.yaml
     - docs/development-plan.md
-  human_readable_status: "Steg 1–5 av 9 i GPT Byggaren 1.5.0-migreringen är klara."
+  human_readable_status: "Steg 1–6 av 9 i GPT Byggaren 1.5.0-migreringen är klara."
