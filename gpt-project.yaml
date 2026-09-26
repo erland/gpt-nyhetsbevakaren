@@ -295,6 +295,10 @@ release:
     optional: false
     version_source: github_release_tag
     workflow: .github/workflows/release.yml
+    asset_selection: active_runtimes
+    include_metadata:
+      - SHA256SUMS.txt
+      - DELIVERY-MANIFEST.json
 testing:
   manifest: evals/test-manifest.yaml
   eval_case_schema: schemas/eval-case.schema.json
