@@ -232,6 +232,58 @@ def build_claude(root: Path, cfg: dict, build_root: Path, version: str) -> Path:
     return out
 
 
+def build_opencode(root: Path, cfg: dict, build_root: Path, version: str) -> Path:
+    out = build_root / "opencode"
+    ensure_clean_dir(out)
+
+    assistant = out / "assistant"
+    policies = assistant / "policies"
+    policies.mkdir(parents=True)
+
+    rcfg = cfg["runtime"]["opencode"]
+    copy_file(root / rcfg["source"]["instructions"], assistant / "instructions.md")
+
+    starters_root = root / rcfg["source"]["conversation_starters"]
+    if starters_root.exists():
+        starters = [p for p in starters_root.rglob("*") if p.is_file() and p.name != "README.md"]
+        if starters:
+            combined = "\n\n".join(p.read_text(encoding="utf-8") for p in sorted(starters))
+            (assistant / "conversation-starters.md").write_text(combined, encoding="utf-8")
+
+    policy_root = root / rcfg["source"]["runtime_policy"]
+    if policy_root.exists():
+        for p in sorted(policy_root.rglob("*.md")):
+            copy_file(p, policies / p.name)
+
+    knowledge_root = root / rcfg["source"]["knowledge"]
+    if knowledge_root.exists():
+        for p in sorted(knowledge_root.rglob("*")):
+            if p.is_file() and p.name != "KNOWLEDGE.md":
+                copy_file(p, out / "knowledge" / p.relative_to(knowledge_root))
+
+    template = (root / rcfg["start_here_template"]).read_text(encoding="utf-8")
+    (out / "START-HERE.md").write_text(
+        render_template(template, {"GPT_NAME": cfg["project"]["name"], "VERSION": version}),
+        encoding="utf-8",
+    )
+    (out / "VERSION").write_text(version + "\n", encoding="utf-8")
+    parity_doc = root / "docs" / "runtime-parity.md"
+    if parity_doc.exists():
+        copy_file(parity_doc, out / "RUNTIME-PARITY.md")
+
+    (out / "RUNTIME-REQUIREMENTS.md").write_text(
+        "# OpenCode runtimekrav\n\n"
+        "- Aktuell webbresearch och källöppning krävs för nyhetsbevakning.\n"
+        "- Lokal kodexekvering är inte en förutsättning för kärnflödet.\n"
+        "- Filskapande behövs i fas 3 när värdmiljön stöder det.\n"
+        "- Direkt schemaläggning är optional.\n"
+        "- Persistent workspace-state krävs inte.\n",
+        encoding="utf-8",
+    )
+    write_manifest(out, cfg["project"]["id"] + "-opencode", version, "START-HERE.md")
+    return out
+
+
 def _knowledge_priority_patterns(cfg: dict) -> list[str]:
     return list(cfg.get("knowledge_architecture", {}).get("custom_gpt", {}).get("priority", []) or [])
 
@@ -487,6 +539,11 @@ def main() -> int:
         claude_root = build_claude(root, cfg, build_root, version)
         claude_zip = dist / runtime_artifact_name(cfg, "claude_projects", version)
         stable_write_zip(claude_zip, claude_root, [p for p in claude_root.rglob("*") if p.is_file()])
+
+    if "opencode" in targets:
+        opencode_root = build_opencode(root, cfg, build_root, version)
+        opencode_zip = dist / runtime_artifact_name(cfg, "opencode", version)
+        stable_write_zip(opencode_zip, opencode_root, [p for p in opencode_root.rglob("*") if p.is_file()])
 
     if "custom-gpt" in targets and cfg["runtime"]["custom_gpt"]["enabled"]:
         custom_root = build_custom(root, cfg, build_root, version)
